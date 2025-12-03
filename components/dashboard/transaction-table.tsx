@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 interface TransactionTableProps {
   transactions: Transaction[];
   pageSize?: number;
+  selectedMonth?: string;
 }
 
 // Helper function to truncate wallet address
@@ -18,7 +19,17 @@ const truncateAddress = (address: string | undefined): string => {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 };
 
-export function TransactionTable({ transactions, pageSize = 10 }: TransactionTableProps) {
+// Helper function to get month name
+const getMonthName = (monthIndex: string): string => {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const index = parseInt(monthIndex);
+  return months[index] || "";
+};
+
+export function TransactionTable({ transactions, pageSize = 10, selectedMonth = "all" }: TransactionTableProps) {
   const [displayCount, setDisplayCount] = useState(pageSize);
   const [isLoading, setIsLoading] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +75,11 @@ export function TransactionTable({ transactions, pageSize = 10 }: TransactionTab
   return (
     <Card className="col-span-3 flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Recent Transactions</CardTitle>
+        <CardTitle>
+          {selectedMonth === "all" 
+            ? "2025 Transactions" 
+            : `${getMonthName(selectedMonth)} Transactions`}
+        </CardTitle>
         <span className="text-sm text-muted-foreground">
           {displayedTransactions.length} of {transactions.length}
         </span>

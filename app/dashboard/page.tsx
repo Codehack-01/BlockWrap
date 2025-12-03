@@ -7,6 +7,7 @@ import { getMockData, WalletData } from "@/lib/mock-data";
 import { fetchWalletData } from "@/app/actions";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { TransactionTable } from "@/components/dashboard/transaction-table";
+import { CryptoTicker } from "@/components/dashboard/crypto-ticker";
 import { WrapModal } from "@/components/shared/wrap-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, DollarSign, Activity, ArrowLeft, Share2 } from "lucide-react";
@@ -146,7 +147,11 @@ function DashboardContent() {
   ];
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6 min-h-screen bg-background">
+    <div className="flex-1 flex flex-col min-h-screen bg-background">
+      {/* Crypto Ticker */}
+      <CryptoTicker />
+      
+      <div className="space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" onClick={() => router.push("/")}>
@@ -269,8 +274,9 @@ function DashboardContent() {
           />
         </div>
         <div className="col-span-3">
-          <TransactionTable transactions={filteredData.transactions} />
+          <TransactionTable transactions={filteredData.transactions} selectedMonth={selectedMonth} />
         </div>
+      </div>
       </div>
     </div>
   );

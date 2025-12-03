@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BarChart2, LineChart as LineChartIcon } from "lucide-react";
+import { BarChart3, TrendingUp } from "lucide-react";
 
 interface ActivityChartProps {
   data: number[] | { name: string; total: number }[];
@@ -31,23 +30,29 @@ export function ActivityChart({ data, title = "Monthly Activity" }: ActivityChar
     <Card className="col-span-4">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
-        <div className="flex items-center space-x-2">
-            <Button 
-                variant={chartType === "line" ? "secondary" : "ghost"} 
-                size="icon" 
-                onClick={() => setChartType("line")}
-                title="Line Chart"
-            >
-                <LineChartIcon className="h-4 w-4" />
-            </Button>
-            <Button 
-                variant={chartType === "bar" ? "secondary" : "ghost"} 
-                size="icon" 
-                onClick={() => setChartType("bar")}
-                title="Bar Chart"
-            >
-                <BarChart2 className="h-4 w-4" />
-            </Button>
+        <div className="flex items-center p-1 bg-white/5 rounded-lg border border-white/10">
+          <button
+            onClick={() => setChartType("line")}
+            className={`flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ${
+              chartType === "line"
+                ? "bg-purple-500 text-white shadow-lg"
+                : "text-white/60 hover:text-white hover:bg-white/5"
+            }`}
+            title="Trendline"
+          >
+            <TrendingUp className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setChartType("bar")}
+            className={`flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ${
+              chartType === "bar"
+                ? "bg-purple-500 text-white shadow-lg"
+                : "text-white/60 hover:text-white hover:bg-white/5"
+            }`}
+            title="Bar Chart"
+          >
+            <BarChart3 className="h-4 w-4" />
+          </button>
         </div>
       </CardHeader>
       <CardContent className="pl-2">

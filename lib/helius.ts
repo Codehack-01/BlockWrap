@@ -327,7 +327,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
                 type,
                 amount: txAmount, // Pass raw amount, let UI handle formatting
                 currency: currency,
-                date: date.toLocaleDateString(),
+                date: date.toLocaleDateString() + ' | ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 timestamp: tx.timestamp, // Add timestamp for easier filtering
                 from: type === "in" ? counterparty : address,
                 to: type === "out" ? counterparty : address,
