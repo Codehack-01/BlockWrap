@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "BlockWrap | Your Crypto Year in Review",
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-background text-foreground" style={{ fontFamily: "'Syne', sans-serif" }}>
         <ThemeProvider>
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
