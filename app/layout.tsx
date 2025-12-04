@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
   title: "BlockWrap | Your Crypto Year in Review",
@@ -39,6 +40,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
           <Analytics />
+          <SpeedInsights/>
         </ThemeProvider>
       </body>
     </html>
