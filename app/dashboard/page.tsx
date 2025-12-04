@@ -130,7 +130,7 @@ function DashboardContent() {
         totalOutflowUsd: parseFloat(outflowUsd.toFixed(2)),
         transactionCount: filteredTxs.length,
         transactions: filteredTxs, // Pass all transactions, pagination handled by component
-        activity: newActivity as any // Cast to any to avoid type conflict with WalletData interface which expects number[]
+        activity: newActivity
     });
 
   }, [selectedMonth, data]);

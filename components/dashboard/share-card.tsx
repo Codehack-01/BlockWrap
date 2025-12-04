@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WalletData } from "@/lib/mock-data";
-import { Share2, Sparkles, Copy, Check, Twitter, ExternalLink } from "lucide-react";
+import { Share2, Sparkles, Copy, Check, ExternalLink } from "lucide-react";
 
 interface ShareCardProps {
   data: WalletData;

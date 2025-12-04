@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
-import { Wallet, TrendingUp, Coins, Sparkles, Trophy, User, ArrowRightLeft, Users, Medal, Calendar, ArrowDownLeft, ArrowUpRight, Rocket } from "lucide-react";
+import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket } from "lucide-react";
 import { WrapCard } from "@/components/shared/wrap-card";
 
 interface SlideProps {

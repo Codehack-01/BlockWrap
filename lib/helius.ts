@@ -53,6 +53,14 @@ interface HeliusTransaction {
     }[];
 }
 
+interface HeliusSignature {
+    signature: string;
+    slot: number;
+    err: unknown;
+    memo: string | null;
+    blockTime: number;
+}
+
 export async function getHeliusData(address: string): Promise<WalletData> {
     if (!HELIUS_API_KEY) {
         throw new Error("HELIUS_API_KEY is not defined");
@@ -176,14 +184,14 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
     // Calculate Month Change (Transactions in last 30 days)
     const thirtyDaysAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
-    const monthChange = signatures.filter((sig: any) => sig.blockTime > thirtyDaysAgo).length;
+    const monthChange = signatures.filter((sig: HeliusSignature) => sig.blockTime > thirtyDaysAgo).length;
 
     // 3. Fetch Transaction History (Enhanced Transactions API)
     // We want to fetch details for as many 2025 transactions as possible (up to the 1000 signatures we have)
     // to ensure "All Time" (YTD) stats are accurate.
 
     const startOf2025 = new Date("2025-01-01T00:00:00Z").getTime() / 1000;
-    const signatures2025 = signatures.filter((s: any) => s.blockTime >= startOf2025).map((s: any) => s.signature);
+    const signatures2025 = signatures.filter((s: HeliusSignature) => s.blockTime >= startOf2025).map((s: HeliusSignature) => s.signature);
 
     let history: HeliusTransaction[] = [];
 
@@ -251,7 +259,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
                 });
                 const json = await response.json();
                 if (json.result) {
-                    json.result.forEach((asset: any) => {
+                    json.result.forEach((asset: HeliusAsset) => {
                         if (asset?.content?.metadata?.symbol) {
                             mintToSymbol.set(asset.id, asset.content.metadata.symbol);
                         }

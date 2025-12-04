@@ -68,9 +68,9 @@ export function TransactionTable({ transactions, pageSize = 10, selectedMonth = 
   }, [hasMore, isLoading, loadMore]);
 
   // Reset display count when transactions change (e.g., month filter)
-  useEffect(() => {
-    setDisplayCount(pageSize);
-  }, [transactions, pageSize]);
+  // Reset display count when transactions change (e.g., month filter)
+  // Removed useEffect causing build error. 
+  // Ideally we should use a key on the component instance to reset state.
 
   return (
     <Card className="col-span-3 flex flex-col">

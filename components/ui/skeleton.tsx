@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
+
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
@@ -48,7 +49,7 @@ export function ChartSkeleton() {
           <Skeleton 
             key={i} 
             className="flex-1 rounded-t-md" 
-            style={{ height: `${Math.random() * 60 + 40}%` }}
+            style={{ height: `${(i % 5 + 1) * 15 + 20}%` }}
           />
         ))}
       </div>

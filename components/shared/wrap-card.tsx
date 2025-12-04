@@ -109,8 +109,8 @@ ${shareUrl}`;
         // Final fallback - just download the image
         handleDownload();
       }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name !== 'AbortError') {
         console.error('Share failed:', err);
       }
     } finally {

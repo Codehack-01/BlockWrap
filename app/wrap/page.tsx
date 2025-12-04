@@ -26,7 +26,6 @@ function WrapContent() {
   const router = useRouter();
   const address = searchParams.get("address");
   const [data, setData] = useState<WalletData | null>(null);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!address) {
@@ -47,7 +46,7 @@ function WrapContent() {
     loadData();
   }, [address, router]);
 
-  if (error) return <div>Failed to load data</div>;
+
 
   if (!data) {
     return <WrapLoadingSkeleton />;

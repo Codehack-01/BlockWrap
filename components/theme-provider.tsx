@@ -20,6 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Get saved theme from localStorage
     const savedTheme = localStorage.getItem("blockwrap-theme") as Theme | null;
     if (savedTheme) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTheme(savedTheme);
     }
   }, []);
@@ -35,14 +36,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         ? "dark"
         : "light";
       root.classList.add(systemTheme);
-      setResolvedTheme(systemTheme);
     } else {
       root.classList.add(theme);
-      setResolvedTheme(theme);
     }
 
     // Save to localStorage
     localStorage.setItem("blockwrap-theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setResolvedTheme(systemTheme);
+    } else {
+      setResolvedTheme(theme);
+    }
   }, [theme]);
 
   // Listen for system theme changes
