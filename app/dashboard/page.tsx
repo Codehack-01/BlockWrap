@@ -9,6 +9,8 @@ import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { TransactionTable } from "@/components/dashboard/transaction-table";
 import { CryptoTicker } from "@/components/dashboard/crypto-ticker";
 import { WrapModal } from "@/components/shared/wrap-modal";
+import { DashboardSkeleton } from "@/components/ui/skeleton";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, DollarSign, Activity, ArrowLeft, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,7 @@ function DashboardContent() {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [filteredData, setFilteredData] = useState<WalletData | null>(null);
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!address) {
@@ -29,6 +32,7 @@ function DashboardContent() {
     }
     
     const loadData = async () => {
+      setIsLoading(true);
       try {
         const walletData = await fetchWalletData(address);
         setData(walletData);
@@ -38,6 +42,8 @@ function DashboardContent() {
         const mock = getMockData(address);
         setData(mock);
         setFilteredData(mock);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -129,7 +135,9 @@ function DashboardContent() {
 
   }, [selectedMonth, data]);
 
-  if (!filteredData) return null;
+  if (isLoading || !filteredData) {
+    return <DashboardSkeleton />;
+  }
 
   const months = [
     { value: "0", label: "January" },
@@ -151,15 +159,16 @@ function DashboardContent() {
       {/* Crypto Ticker */}
       <CryptoTicker />
       
-      <div className="space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
+      <div className="space-y-4 p-4 md:p-8 pt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" onClick={() => router.push("/")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Dashboard</h2>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <ThemeToggle />
           <select 
             className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             value={selectedMonth}
@@ -170,11 +179,14 @@ function DashboardContent() {
                 <option key={month.value} value={month.value}>{month.label}</option>
             ))}
           </select>
-          <Button variant="outline" onClick={() => setIsWrapModalOpen(true)}>
+          <Button variant="outline" onClick={() => setIsWrapModalOpen(true)} className="hidden sm:flex">
             <Share2 className="h-4 w-4 mr-2" />
             Share Wrap
           </Button>
-          <Button onClick={() => router.push(`/wrap?address=${address}`)}>
+          <Button variant="outline" size="icon" onClick={() => setIsWrapModalOpen(true)} className="sm:hidden">
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => router.push(`/wrap?address=${address}`)} className="hidden sm:flex">
             Replay Wrapped
           </Button>
         </div>
@@ -219,7 +231,7 @@ function DashboardContent() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-                {selectedMonth === "all" ? "2025 Inflow" : "Monthly Inflow"}
+                {selectedMonth === "all" ? "2025 Inflow" : `${months.find(m => m.value === selectedMonth)?.label} Inflow`}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
@@ -233,7 +245,7 @@ function DashboardContent() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-                {selectedMonth === "all" ? "2025 Outflow" : "Monthly Outflow"}
+                {selectedMonth === "all" ? "2025 Outflow" : `${months.find(m => m.value === selectedMonth)?.label} Outflow`}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-red-500" />
           </CardHeader>
@@ -267,13 +279,13 @@ function DashboardContent() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="col-span-4">
+        <div className="md:col-span-2 lg:col-span-4">
           <ActivityChart 
             data={filteredData.activity} 
             title={selectedMonth === "all" ? "Monthly Activity" : "Daily Activity"}
           />
         </div>
-        <div className="col-span-3">
+        <div className="md:col-span-2 lg:col-span-3">
           <TransactionTable transactions={filteredData.transactions} selectedMonth={selectedMonth} />
         </div>
       </div>
@@ -284,7 +296,7 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <DashboardContent />
     </Suspense>
   );

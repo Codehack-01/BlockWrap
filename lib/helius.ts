@@ -1,4 +1,4 @@
-import { WalletData, Transaction } from "./mock-data";
+import { WalletData, Transaction, TopWallet } from "./mock-data";
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
 const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
@@ -107,6 +107,13 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         };
     }
 
+    const allAssets: { symbol: string; amount: number; valueUsd: number }[] = [];
+
+    // Add SOL if it exists
+    if (topAsset.amount > 0) {
+        allAssets.push(topAsset);
+    }
+
     assets.forEach((asset) => {
         // Skip if no token info (e.g. some NFTs or compressed assets)
         if (!asset.token_info) return;
@@ -117,24 +124,35 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         const value = asset.token_info.price_info?.total_price || 0;
         const symbol = asset.content.metadata.symbol || "Unknown";
 
-        // Logic: Strictly prioritize USD Value.
-        // If we have price data, use it.
-        if (value > topAsset.valueUsd) {
-            topAsset = { symbol, amount, valueUsd: value };
-        }
-        // If both have 0 USD value (or very low), prefer non-SOL tokens just for variety, 
-        // but ONLY if the current top asset is effectively worthless (< $10).
-        // This ensures that if you have $600 SOL, it shows SOL. But if you have $4 SOL and a meme coin, it shows the meme coin.
-        else if (topAsset.valueUsd < 10 && value === 0 && symbol !== "SOL" && topAsset.symbol === "SOL") {
-            topAsset = { symbol, amount, valueUsd: value };
+        // Add to list
+        if (amount > 0) {
+            allAssets.push({ symbol, amount, valueUsd: value });
         }
     });
 
-    // Create a map of Mint -> Symbol for quick lookup
+    // Sort by USD Value descending
+    allAssets.sort((a, b) => b.valueUsd - a.valueUsd);
+
+    // Update topAsset to be the actual top one (if any exist)
+    if (allAssets.length > 0) {
+        topAsset = allAssets[0];
+    }
+
+    // Get Top 5
+    const topAssets = allAssets.slice(0, 5);
+
+    // Create a map of Mint -> Symbol and Mint -> Price for quick lookup
     const mintToSymbol = new Map<string, string>();
+    const mintToPrice = new Map<string, number>();
+
     assets.forEach(asset => {
-        if (asset.id && asset.content.metadata.symbol) {
-            mintToSymbol.set(asset.id, asset.content.metadata.symbol);
+        if (asset.id) {
+            if (asset.content.metadata.symbol) {
+                mintToSymbol.set(asset.id, asset.content.metadata.symbol);
+            }
+            if (asset.token_info?.price_info?.price_per_token) {
+                mintToPrice.set(asset.id, asset.token_info.price_info.price_per_token);
+            }
         }
     });
 
@@ -237,6 +255,9 @@ export async function getHeliusData(address: string): Promise<WalletData> {
                         if (asset?.content?.metadata?.symbol) {
                             mintToSymbol.set(asset.id, asset.content.metadata.symbol);
                         }
+                        if (asset?.token_info?.price_info?.price_per_token) {
+                            mintToPrice.set(asset.id, asset.token_info.price_info.price_per_token);
+                        }
                     });
                 }
             } catch (e) {
@@ -256,6 +277,8 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
     const activity = new Array(12).fill(0);
     const transactions: Transaction[] = [];
+    const walletInteractions = new Map<string, TopWallet>();
+    let biggestTx = { amount: 0, currency: "SOL", to: "Unknown", date: "N/A", usdValue: 0 };
 
     history.forEach((tx) => {
         const date = new Date(tx.timestamp * 1000);
@@ -335,8 +358,85 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
             // Add to full list
             transactions.push(formattedTx);
+
+            // Check for biggest transaction
+            // Calculate USD value
+            let txUsdValue = 0;
+            if (formattedTx.currency === "SOL") {
+                txUsdValue = formattedTx.amount * (assetsJson.result?.nativeBalance?.price_per_sol || 0);
+            } else {
+                // Try to find mint for this currency (this is tricky since we only have symbol in formattedTx)
+                // We need to look at the raw tx again or store mint in formattedTx
+                // Simpler: we know the mint from the loop above if it was a token transfer
+                if (tx.tokenTransfers && tx.tokenTransfers.length > 0) {
+                    const transfer = tx.tokenTransfers.find(t => t.fromUserAccount === address || t.toUserAccount === address);
+                    if (transfer && transfer.mint) {
+                        const price = mintToPrice.get(transfer.mint) || 0;
+                        txUsdValue = formattedTx.amount * price;
+                    }
+                }
+            }
+
+            if (txUsdValue > biggestTx.usdValue) {
+                biggestTx = {
+                    amount: formattedTx.amount,
+                    currency: formattedTx.currency,
+                    to: formattedTx.to,
+                    date: date.toLocaleDateString(),
+                    usdValue: txUsdValue
+                };
+            }
+        }
+
+        // Track interactions
+        if (counterparty && counterparty !== address) {
+            // Map "in"/"out" to "received"/"sent"
+            const interactionType = type === "in" ? "received" : "sent";
+
+            const existing = walletInteractions.get(counterparty) || {
+                address: counterparty,
+                interactionCount: 0,
+                totalVolume: 0,
+                type: interactionType
+            };
+
+            existing.interactionCount++;
+            existing.totalVolume += txAmount;
+
+            // Update type if different (to become "both")
+            if (existing.type !== "both" && existing.type !== interactionType) {
+                existing.type = "both";
+            }
+
+            walletInteractions.set(counterparty, existing);
         }
     });
+
+    // Calculate Most Active Day
+    const dayCounts = new Map<string, number>();
+    transactions.forEach(tx => {
+        // tx.date is already formatted as "YYYY-MM-DD | HH:MM" or similar, 
+        // but let's use the raw timestamp to be safe and format it as YYYY-MM-DD
+        const dateObj = new Date((tx.timestamp || 0) * 1000);
+        const dateKey = dateObj.toLocaleDateString(); // e.g. "12/25/2024"
+
+        dayCounts.set(dateKey, (dayCounts.get(dateKey) || 0) + 1);
+    });
+
+    let mostActiveDay = { date: "Jan 1", count: 0 };
+    let maxCount = 0;
+
+    dayCounts.forEach((count, date) => {
+        if (count > maxCount) {
+            maxCount = count;
+            mostActiveDay = { date, count };
+        }
+    });
+
+    // Process Top Wallets
+    const topWallets = Array.from(walletInteractions.values())
+        .sort((a, b) => b.interactionCount - a.interactionCount)
+        .slice(0, 5);
 
     // Sort transactions by date (newest first)
     transactions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -372,10 +472,14 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         monthChange,
         volumeChangePercentage: parseFloat(volumeChangePercentage.toFixed(1)),
         topAsset,
+        topAssets,
+        topWallets,
+        mostActiveDay,
         activity,
         personality,
         transactions: transactions.slice(0, 10), // Keep top 10 for default view
         allTransactions: transactions, // Send all for filtering
-        solPrice
+        solPrice,
+        biggestTransaction: biggestTx
     };
 }
