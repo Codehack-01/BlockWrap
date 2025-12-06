@@ -775,31 +775,204 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
 }
 
 export function ShareSlide({ data }: SlideProps) {
-  return (
-    <div className="h-full w-full flex flex-col justify-center items-center p-8 relative overflow-hidden bg-zinc-950">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-800/20 via-zinc-950 to-zinc-950 pointer-events-none" />
+  const slideRef = useRef<HTMLDivElement>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  
+  const { percentile, label } = data.walletRank || { percentile: 50, label: "Solana Plankton" };
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const dataUrl = await toPng(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      const link = document.createElement("a");
+      link.download = `blockwrap-summary-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Capture failed:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsSharing(true);
+    try {
+      const blob = await toBlob(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const file = new File([blob], "summary.png", { type: "image/png" });
       
-      <div className="relative z-10 w-full max-w-md text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <h2 className="text-4xl font-bold tracking-tighter text-white mb-4">Share It</h2>
-          <p className="font-space text-zinc-500 uppercase tracking-widest text-sm">
-            Show off your 2025 on-chain legacy
-          </p>
-        </motion.div>
-        
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="transform hover:scale-[1.02] transition-transform duration-500"
-        >
-          <WrapCard data={data} />
-        </motion.div>
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: "My BlockWrap 2025 Summary",
+          text: `Check out my 2025 on-chain stats! Volume: $${data.totalVolume.toLocaleString()} • Rank: Top ${percentile}%`,
+          files: [file],
+        });
+      } else {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]); 
+        alert("Image copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  return (
+    <div ref={slideRef} className="h-full w-full flex flex-col p-6 md:p-8 relative overflow-hidden bg-zinc-950 font-syne text-white">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      
+      {/* Header */}
+      <div className="relative z-10 flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tighter mb-1">2025 Wrapped</h1>
+          <p className="font-space text-zinc-500 text-sm tracking-wider uppercase">{data.address.slice(0, 4)}...{data.address.slice(-4)}</p>
+        </div>
+        <div className="text-right">
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+             <span className="text-xs font-space text-zinc-400">ON-CHAIN</span>
+           </div>
+        </div>
       </div>
+
+      {/* Grid Content */}
+      <div className="relative z-10 flex-1 grid grid-cols-2 gap-4">
+        {/* Total Volume - Big Block */}
+        <div className="col-span-2 bg-gradient-to-br from-purple-900/40 to-black border border-purple-500/20 rounded-3xl p-6 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors" />
+          <div className="relative z-10">
+             <div className="flex items-center gap-2 mb-2 text-purple-300">
+               <TrendingUp className="w-4 h-4" />
+               <span className="text-xs font-space uppercase tracking-wider">Total Volume</span>
+             </div>
+             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+               <p className="text-5xl md:text-6xl font-bold tracking-tighter text-white">
+                 ${data.totalVolume.toLocaleString()}
+               </p>
+               <div className="md:text-right">
+                 <p className="text-2xl font-bold text-white/80">{data.transactionCount.toLocaleString()}</p>
+                 <p className="text-xs font-space uppercase tracking-wider text-zinc-500">Transactions</p>
+               </div>
+             </div>
+          </div>
+        </div>
+
+        {/* Top Asset */}
+        <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5 flex flex-col justify-between">
+           <div className="flex items-center gap-2 text-zinc-400 mb-2">
+             <Coins className="w-4 h-4" />
+             <span className="text-xs font-space uppercase tracking-wider">Top Asset</span>
+           </div>
+           <div>
+             <p className="text-3xl font-bold text-white mb-1">{data.topAsset.symbol}</p>
+             <p className="text-sm text-zinc-500 font-space">${data.topAsset.valueUsd.toLocaleString()} Value</p>
+           </div>
+        </div>
+
+        {/* Global Rank */}
+        <div className="bg-zinc-900/60 border border-amber-500/20 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 blur-2xl rounded-full" />
+           <div className="relative z-10">
+             <div className="flex items-center gap-2 text-amber-500/80 mb-2">
+               <Trophy className="w-4 h-4" />
+               <span className="text-xs font-space uppercase tracking-wider">Rank</span>
+             </div>
+             <p className="text-3xl font-bold text-white mb-1">Top {percentile}%</p>
+             <p className="text-xs text-amber-500/60 font-space uppercase">{label}</p>
+           </div>
+        </div>
+
+        {/* Net Flow */}
+        <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
+           <div className="flex items-center gap-2 text-zinc-400 mb-4">
+             <ArrowRightLeft className="w-4 h-4" />
+             <span className="text-xs font-space uppercase tracking-wider">Net Flow</span>
+           </div>
+           <div className="space-y-3">
+             <div className="flex justify-between items-center">
+               <span className="text-xs text-zinc-500">In</span>
+               <span className="text-sm font-bold text-green-400">+${data.totalInflowUsd?.toLocaleString() ?? "0"}</span>
+             </div>
+             <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+               <div className="h-full bg-green-500/50 w-[70%]" />
+             </div>
+             <div className="flex justify-between items-center">
+               <span className="text-xs text-zinc-500">Out</span>
+               <span className="text-sm font-bold text-red-400">-${data.totalOutflowUsd?.toLocaleString() ?? "0"}</span>
+             </div>
+              <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+               <div className="h-full bg-red-500/50 w-[40%]" />
+             </div>
+           </div>
+        </div>
+
+        {/* Personality */}
+        <div className="bg-gradient-to-br from-pink-900/40 to-black border border-pink-500/20 rounded-3xl p-5 flex flex-col justify-center items-center text-center">
+            <Sparkles className="w-6 h-6 text-pink-400 mb-2" />
+            <p className="text-lg font-bold text-white">{data.personality}</p>
+            <p className="text-[10px] text-pink-400/60 uppercase tracking-widest mt-1">Vibe Check</p>
+        </div>
+      </div>
+
+      {/* Footer Branding */}
+      <div className="mt-6 flex justify-between items-end relative z-10">
+         <div className="flex flex-col">
+            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">BlockWrap</span>
+            <span className="text-[10px] text-white font-space tracking-wider">blockwrap.xyz</span>
+         </div>
+      </div>
+
+      {/* Action Bar */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="absolute bottom-8 left-0 right-0 z-50 flex justify-center gap-4 no-capture"
+        data-html2canvas-ignore
+      >
+        <button
+          onClick={handleShare}
+          disabled={isSharing}
+          className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50 shadow-lg shadow-white/10"
+        >
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+          <span>Share</span>
+        </button>
+
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/90 backdrop-blur-md border border-zinc-700 rounded-full text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          <span>Save</span>
+        </button>
+      </motion.div>
     </div>
   );
 }
