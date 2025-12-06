@@ -155,7 +155,7 @@ function DashboardContent() {
   ];
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen bg-background">
+    <div className="flex-1 flex flex-col min-h-screen bg-background font-outfit">
       {/* Crypto Ticker */}
       <CryptoTicker />
       
@@ -165,10 +165,10 @@ function DashboardContent() {
           <Button variant="outline" size="icon" onClick={() => router.push("/")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Dashboard</h2>
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">BlockWrap</h2>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
           <select 
             className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             value={selectedMonth}

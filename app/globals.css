@@ -115,6 +115,10 @@
     font-family: 'Space Grotesk', sans-serif;
   }
 
+  .font-outfit {
+    font-family: 'Outfit', sans-serif;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;

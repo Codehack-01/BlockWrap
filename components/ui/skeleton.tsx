@@ -87,7 +87,7 @@ export function DashboardSkeleton() {
     <div className="flex-1 flex flex-col min-h-screen bg-background">
       {/* Ticker skeleton */}
       <div className="w-full bg-black/40 border-b border-white/10 py-3 px-4">
-        <div className="flex gap-8">
+        <div className="flex gap-8 justify-center">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2">
               <Skeleton className="h-4 w-8" />
@@ -137,27 +137,60 @@ export function DashboardSkeleton() {
 // Wrap loading animation
 export function WrapLoadingSkeleton() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black text-white">
-      <div className="flex flex-col items-center max-w-sm mx-auto px-4">
-        {/* Animated rings */}
-        <div className="relative w-24 h-24 mb-8">
-          <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
-          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-purple-500 animate-spin" />
-          <div className="absolute inset-2 rounded-full border-4 border-transparent border-t-pink-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
-          <div className="absolute inset-4 rounded-full border-4 border-transparent border-t-blue-500 animate-spin" style={{ animationDuration: '2s' }} />
+    <div className="flex min-h-screen items-center justify-center bg-black text-white relative overflow-hidden">
+      {/* Background Grid Effect */}
+      <div 
+        className="absolute inset-0 opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }} 
+      />
+      
+      <div className="flex flex-col items-center max-w-sm mx-auto px-4 relative z-10">
+        {/* Radar Scanner Animation */}
+        <div className="relative w-48 h-48 mb-12 flex items-center justify-center">
+          {/* Outer Dashed Ring - Slow Rotation */}
+          <div className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/30 animate-[spin_10s_linear_infinite]" />
+          
+          {/* Middle Ring - Reverse Rotation */}
+          <div className="absolute inset-4 rounded-full border border-emerald-500/50 animate-[spin_3s_linear_infinite_reverse]" />
+          
+          {/* Inner Ring - Pulse */}
+          <div className="absolute inset-12 rounded-full border-2 border-emerald-400 opacity-50 animate-pulse" />
+          
+          {/* Radar Sweep - Clockwise Scan */}
+          <div className="absolute inset-2 rounded-full overflow-hidden animate-[spin_2s_linear_infinite]">
+            <div className="w-1/2 h-full bg-gradient-to-l from-emerald-500/20 to-transparent blur-sm absolute right-0" />
+            <div className="w-full h-1 bg-emerald-400 absolute top-1/2 -translate-y-1/2 shadow-[0_0_10px_#34d399]" />
+          </div>
+
+          {/* Center Target */}
+          <div className="absolute w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_15px_#34d399] animate-ping" />
+          
+          {/* Decorative Crosshairs */}
+          <div className="absolute top-0 bottom-0 w-px bg-emerald-500/20" />
+          <div className="absolute left-0 right-0 h-px bg-emerald-500/20" />
         </div>
 
-        {/* Loading text */}
-        <h2 className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Analyzing Your Wallet
-        </h2>
+        {/* Loading text with typewriter effect vibe */}
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-mono font-bold text-emerald-400 tracking-widest uppercase">
+            Initialising Scan
+          </h2>
+          <div className="flex gap-1 justify-center">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" />
+          </div>
+        </div>
         
-        {/* Progress steps */}
-        <div className="space-y-3 w-full mt-4">
-          <LoadingStep text="Fetching transactions..." delay={0} />
-          <LoadingStep text="Calculating volume..." delay={500} />
-          <LoadingStep text="Analyzing patterns..." delay={1000} />
-          <LoadingStep text="Generating your wrap..." delay={1500} />
+        {/* Progress steps (Terminal style) */}
+        <div className="mt-8 space-y-2 w-64 font-mono text-xs">
+          <LoadingStep text="> Accessing blockchain data..." delay={0} />
+          <LoadingStep text="> Decrypting wallet history..." delay={800} />
+          <LoadingStep text="> Identifying patterns..." delay={1600} />
+          <LoadingStep text="> Generating report..." delay={2400} />
         </div>
       </div>
     </div>
@@ -167,11 +200,10 @@ export function WrapLoadingSkeleton() {
 function LoadingStep({ text, delay }: { text: string; delay: number }) {
   return (
     <div 
-      className="flex items-center gap-3 text-white/60 animate-fade-in"
+      className="flex items-center gap-3 text-emerald-500/60 animate-fade-in"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
-      <span className="text-sm">{text}</span>
+      <span className="text-emerald-500">{text}</span>
     </div>
   );
 }

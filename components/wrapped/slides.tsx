@@ -121,6 +121,7 @@ export function TopAssetSlide({ data }: SlideProps) {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-20"
         >
           <div className="flex items-center gap-3 mb-6">
             <Coins className="h-5 w-5 text-emerald-400" />
@@ -147,7 +148,7 @@ export function TopAssetSlide({ data }: SlideProps) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="relative hidden md:block"
+          className="relative hidden md:block z-10"
         >
           <div className="aspect-square rounded-full border border-zinc-800 flex items-center justify-center relative">
             <div className="absolute inset-0 bg-emerald-500/5 rounded-full animate-pulse" />
@@ -386,7 +387,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
               <ArrowUpRight className="h-5 w-5 text-red-500" />
               <span className="font-space text-sm uppercase tracking-widest text-red-500">Outflow</span>
             </div>
-            <p className="text-6xl md:text-5xl font-bold text-white tracking-tighter mb-2">
+            <p className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-2">
               -{data.totalOutflow?.toLocaleString() ?? 0}
             </p>
             <p className="font-space text-xl text-zinc-500">
