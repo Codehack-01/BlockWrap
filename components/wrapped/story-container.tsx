@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
-import { IntroSlide, VolumeSlide, TopAssetSlide, PersonalitySlide, InflowOutflowSlide } from "./slides";
-import { useRouter } from "next/navigation";
+// import { IntroSlide, VolumeSlide, TopAssetSlide, PersonalitySlide, InflowOutflowSlide } from "./slides";
+// import { useRouter } from "next/navigation";
 
 interface StoryContainerProps {
   slides: React.ReactNode[];
@@ -14,7 +14,7 @@ interface StoryContainerProps {
 export function StoryContainer({ slides, onComplete }: StoryContainerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const router = useRouter();
+  // const router = useRouter(); // Unused
 
   const SLIDE_DURATION = 5000; // 5 seconds per slide
 

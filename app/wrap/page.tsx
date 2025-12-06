@@ -27,6 +27,7 @@ function WrapContent() {
   const router = useRouter();
   const address = searchParams.get("address");
   const [data, setData] = useState<WalletData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!address) {
@@ -38,16 +39,54 @@ function WrapContent() {
       try {
         const walletData = await fetchWalletData(address);
         setData(walletData);
-      } catch (err) {
-        console.error("API Error, falling back to mock:", err);
-        setData(getMockData(address));
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message === "INVALID_WALLET_ADDRESS") {
+          setError("INVALID_WALLET_ADDRESS");
+        } else {
+          console.error("API Error, falling back to mock:", err);
+          setData(getMockData(address));
+        }
       }
     };
 
     loadData();
   }, [address, router]);
 
+  if (error === "INVALID_WALLET_ADDRESS") {
+    return (
+      <div className="h-screen w-full bg-black text-white flex items-center justify-center font-syne relative overflow-hidden">
+        <GrainOverlay />
+        <div className="z-10 text-center space-y-6 max-w-md px-4">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              strokeWidth={1.5} 
+              stroke="currentColor" 
+              className="w-10 h-10 text-red-500"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+          </div>
+          
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Invalid Wallet</h1>
+            <p className="text-white/60">
+              The address you entered doesn&apos;t look like a Solana wallet. Please check and try again.
+            </p>
+          </div>
 
+          <button
+            onClick={() => router.push("/")}
+            className="px-8 py-3 bg-white text-black rounded-full font-bold hover:bg-white/90 transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!data) {
     return <WrapLoadingSkeleton />;

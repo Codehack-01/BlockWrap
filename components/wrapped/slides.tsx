@@ -1,9 +1,11 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
-import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket } from "lucide-react";
+import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2 } from "lucide-react";
 import { WrapCard } from "@/components/shared/wrap-card";
+import { toBlob, toPng } from "html-to-image";
 
 interface SlideProps {
   data: WalletData;
@@ -112,8 +114,71 @@ export function VolumeSlide({ data }: SlideProps) {
 }
 
 export function TopAssetSlide({ data }: SlideProps) {
+  const slideRef = useRef<HTMLDivElement>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for render
+
+      const dataUrl = await toPng(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      const link = document.createElement("a");
+      link.download = `blockwrap-top-asset-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Capture failed:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsSharing(true);
+    try {
+      const blob = await toBlob(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const file = new File([blob], "top-asset.png", { type: "image/png" });
+      
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: "My Top Crypto Asset 2025",
+          text: `Check out my top asset: ${data.topAsset.symbol}!`,
+          files: [file],
+        });
+      } else {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]); 
+        alert("Image copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   return (
-    <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
+    <div ref={slideRef} className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
       <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-emerald-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -158,6 +223,33 @@ export function TopAssetSlide({ data }: SlideProps) {
           </div>
         </motion.div>
       </div>
+
+      {/* Action Bar */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="absolute bottom-8 left-0 right-0 z-50 flex justify-center gap-4 no-capture"
+        data-html2canvas-ignore
+      >
+        <button
+          onClick={handleShare}
+          disabled={isSharing}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+          <span className="hidden md:inline">Share</span>
+        </button>
+
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          <span className="hidden md:inline">Save</span>
+        </button>
+      </motion.div>
     </div>
   );
 }
@@ -185,7 +277,7 @@ export function TopAssetsSlide({ data }: SlideProps) {
         <div className="space-y-0">
           {topAssets.map((asset, index) => (
             <motion.div
-              key={asset.symbol}
+              key={`${asset.symbol}-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
@@ -337,10 +429,80 @@ export function PersonalitySlide({ data }: SlideProps) {
   );
 }
 
+// import { toBlob, toPng } from "html-to-image"; // Duplicate removed
+// import html2canvas from "html2canvas"; // Removed
+
+// ... (inside component)
+
 export function InflowOutflowSlide({ data }: SlideProps) {
+  const slideRef = useRef<HTMLDivElement>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    if (!slideRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      // Small delay to ensure render is stable
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const dataUrl = await toPng(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      const link = document.createElement("a");
+      link.download = `blockwrap-money-moves-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Capture failed:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsSharing(true);
+    try {
+      const blob = await toBlob(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const file = new File([blob], "money-moves.png", { type: "image/png" });
+      
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: "My BlockWrap 2025 Money Moves",
+          text: "Check out my on-chain flow analysis!",
+          files: [file],
+        });
+      } else {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]); 
+        alert("Image copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+      // Fallback/Error UI could be added here
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   return (
-    <div className="h-full w-full flex flex-col justify-center relative overflow-hidden bg-zinc-950">
-      <div className="absolute inset-0 flex">
+    <div ref={slideRef} className="h-full w-full flex flex-col justify-center relative overflow-hidden bg-zinc-950">
+      <div className="absolute inset-0 flex pointer-events-none">
         <div className="w-1/2 h-full bg-zinc-950 border-r border-zinc-800" />
         <div className="w-1/2 h-full bg-zinc-900/30" />
       </div>
@@ -396,6 +558,33 @@ export function InflowOutflowSlide({ data }: SlideProps) {
           </motion.div>
         </div>
       </div>
+
+      {/* Action Bar - Styled to float at bottom */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="absolute bottom-8 left-0 right-0 z-50 flex justify-center gap-4 no-capture"
+        data-html2canvas-ignore // Don't capture the buttons themselves
+      >
+        <button
+          onClick={handleShare}
+          disabled={isSharing}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+          <span className="hidden md:inline">Share</span>
+        </button>
+
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          <span className="hidden md:inline">Save</span>
+        </button>
+      </motion.div>
     </div>
   );
 }
@@ -445,9 +634,72 @@ export function MostActiveDaySlide({ data }: SlideProps) {
 
 export function BiggestTransactionSlide({ data }: SlideProps) {
   const { amount, currency, to, date, usdValue } = data.biggestTransaction || { amount: 0, currency: "SOL", to: "Unknown", date: "N/A", usdValue: 0 };
+  
+  const slideRef = useRef<HTMLDivElement>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for render
+
+      const dataUrl = await toPng(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      const link = document.createElement("a");
+      link.download = `blockwrap-biggest-tx-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Capture failed:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsSharing(true);
+    try {
+      const blob = await toBlob(slideRef.current, {
+        cacheBust: true,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+      });
+
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const file = new File([blob], "biggest-tx.png", { type: "image/png" });
+      
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: "My Biggest 2025 Transaction",
+          text: `I moved ${amount.toLocaleString()} ${currency} on Solana!`,
+          files: [file],
+        });
+      } else {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]); 
+        alert("Image copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   return (
-    <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
+    <div ref={slideRef} className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
       <div className="absolute bottom-[-20%] right-[-20%] w-[800px] h-[800px] bg-indigo-600/10 blur-[150px] rounded-full mix-blend-screen pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
@@ -491,6 +743,33 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
           <p className="font-space text-xs text-zinc-600 mt-4">{date}</p>
         </motion.div>
       </div>
+
+      {/* Action Bar */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="absolute bottom-8 left-0 right-0 z-50 flex justify-center gap-4 no-capture"
+        data-html2canvas-ignore
+      >
+        <button
+          onClick={handleShare}
+          disabled={isSharing}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+          <span className="hidden md:inline">Share</span>
+        </button>
+
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          <span className="hidden md:inline">Save</span>
+        </button>
+      </motion.div>
     </div>
   );
 }

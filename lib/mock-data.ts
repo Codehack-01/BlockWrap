@@ -61,7 +61,7 @@ export interface WalletData {
 
 export const getMockData = (address: string): WalletData => {
     // Deterministic mock data based on address length or char codes to make it feel "real"
-    const seed = address.length;
+    // const seed = address.slice(0, 8); // Unused
 
     return {
         address,

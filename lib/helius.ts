@@ -3,19 +3,7 @@ import { WalletData, Transaction, TopWallet } from "./mock-data";
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
 const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
 
-interface HeliusResponse {
-    result: {
-        items: HeliusAsset[];
-        nativeBalance: {
-            lamports: number;
-            price_per_sol: number;
-            total_price: number;
-        };
-    };
-    error?: {
-        message: string;
-    };
-}
+// HeliusResponse interface removed as it is unused
 
 interface HeliusAsset {
     id: string;
