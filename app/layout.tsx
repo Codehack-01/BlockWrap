@@ -5,8 +5,15 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
-  title: "BlockWrap | Your Crypto Year in Review",
-  description: "Visualize your blockchain activity with a premium, Spotify Wrapped-style experience.",
+  title: "BlockWrap | Your SOL Transactions Tracker",
+  description: "Visualize your Solana blockchain activity and track expenses in real-time.",
+  openGraph: {
+    images: ["/blockbanner.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/blockbanner.jpg"],
+  },
 };
 
 export default function RootLayout({
