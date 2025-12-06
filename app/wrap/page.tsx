@@ -14,6 +14,7 @@ import {
   InflowOutflowSlide, 
   MostActiveDaySlide,
   BiggestTransactionSlide,
+  WalletRankSlide,
   ShareSlide 
 } from "@/components/wrapped/slides";
 import { GrainOverlay } from "@/components/wrapped/grain-overlay";
@@ -61,6 +62,7 @@ function WrapContent() {
     <TopWalletsSlide key="top-wallets" data={data} />,
     <MostActiveDaySlide key="active-day" data={data} />,
     <BiggestTransactionSlide key="biggest-tx" data={data} />,
+    <WalletRankSlide key="rank" data={data} />,
     <PersonalitySlide key="personality" data={data} />,
     <ShareSlide key="share" data={data} />,
   ];

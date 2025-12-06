@@ -469,6 +469,19 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     const totalInflowUsd = totalInflow * solPrice;
     const totalOutflowUsd = totalOutflow * solPrice;
 
+    // Calculate Rank
+    const calculateRank = (solBalance: number) => {
+        if (solBalance >= 10000) return { percentile: 0.01, label: "Solana Whale" };
+        if (solBalance >= 1000) return { percentile: 0.1, label: "Solana Titan" };
+        if (solBalance >= 100) return { percentile: 1, label: "Solana Shark" };
+        if (solBalance >= 10) return { percentile: 5, label: "Solana Dolphin" };
+        if (solBalance >= 1) return { percentile: 20, label: "Solana Fish" };
+        return { percentile: 50, label: "Solana Plankton" };
+    };
+
+    const solBalance = assetsJson.result?.nativeBalance?.lamports ? assetsJson.result.nativeBalance.lamports / 1e9 : 0;
+    const walletRank = calculateRank(solBalance);
+
     return {
         address,
         totalVolume: parseFloat(totalVolume.toFixed(2)),
@@ -485,6 +498,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         mostActiveDay,
         activity,
         personality,
+        walletRank,
         transactions: transactions.slice(0, 10), // Keep top 10 for default view
         allTransactions: transactions, // Send all for filtering
         solPrice,

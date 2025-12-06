@@ -22,6 +22,11 @@ export interface TopWallet {
     type: "sent" | "received" | "both";
 }
 
+export interface WalletRank {
+    percentile: number; // e.g. 5 for Top 5%
+    label: string; // e.g. "Solana Shark"
+}
+
 export interface WalletData {
     address: string;
     totalVolume: number;
@@ -41,6 +46,7 @@ export interface WalletData {
     monthChange?: number; // Transactions in the last 30 days
     volumeChangePercentage?: number; // % change in volume vs previous 30 days
     personality: "The HODLer" | "The Degen" | "The Trader" | "The NFT Collector";
+    walletRank?: WalletRank; // Added
     transactions: Transaction[];
     allTransactions?: Transaction[]; // For filtering
     solPrice?: number; // For dynamic USD calculation
@@ -88,6 +94,10 @@ export const getMockData = (address: string): WalletData => {
         ],
         activity: [10, 25, 40, 30, 60, 80, 45, 90, 100, 75, 50, 120],
         personality: "The Degen",
+        walletRank: {
+            percentile: 5,
+            label: "Solana Shark"
+        },
         transactions: [
             { hash: "0x123...", type: "in", amount: 1.5, currency: "SOL", date: "2024-12-01" },
             { hash: "0x456...", type: "out", amount: 0.5, currency: "SOL", date: "2024-11-28" },

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (address) {
-      // In a real app, we'd validate the address here
       router.push(`/wrap?address=${address}`);
     }
   };
@@ -24,6 +24,9 @@ export default function Home() {
       {/* Background Gradients */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+      
+      {/* Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="z-10 w-full max-w-md space-y-8 text-center">
         <motion.div
@@ -35,7 +38,7 @@ export default function Home() {
             BlockWrap
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl">
-            Your Crypto Year in Review. <br />
+            Get deep insight on you solana transactions. <br />
             Unwrap your blockchain story.
           </p>
         </motion.div>
@@ -46,13 +49,13 @@ export default function Home() {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="bg-card/50 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-2xl"
         >
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <Wallet className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+          <form onSubmit={handleSubmit} className="space-y-4 ">
+            <div className="relative flex items-center">
+              <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Enter ETH or SOL address"
-                className="pl-10 h-12 bg-background/50 border-white/10 focus:border-primary/50 transition-all text-lg"
+                placeholder="Enter SOL address"
+                className="pl-10 h-12 bg-background/50 border-white/10 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-500 transition-all text-lg"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
@@ -71,13 +74,29 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="flex justify-center gap-4 text-sm text-muted-foreground"
+          className="flex justify-center gap-4 text-lg text-muted-foreground"
         >
-          <span>Ethereum</span>
+          {/* <span>Ethereum</span> */}
           <span>•</span>
           <span>Solana</span>
           <span>•</span>
-          <span>Polygon</span>
+          {/* <span>Polygon</span> */}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="flex items-center justify-center gap-3 text-lg text-muted-foreground mt-12"
+        >
+          <span>Powered by</span>
+          <Image
+            src="/helius.png"
+            alt="Helius"
+            width={80}
+            height={80}
+            className="opacity-70 hover:opacity-100 transition-opacity"
+          />
         </motion.div>
       </div>
     </main>

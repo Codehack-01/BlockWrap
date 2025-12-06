@@ -523,3 +523,51 @@ export function ShareSlide({ data }: SlideProps) {
     </div>
   );
 }
+
+export function WalletRankSlide({ data }: SlideProps) {
+  const { percentile, label } = data.walletRank || { percentile: 50, label: "Solana Plankton" };
+
+  return (
+    <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
+      <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-amber-500/10 blur-[150px] rounded-full mix-blend-screen pointer-events-none" />
+      
+      <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <Trophy className="h-12 w-12 text-amber-400 mx-auto mb-6" />
+          <h2 className="font-space text-sm uppercase tracking-widest text-amber-400 mb-2">Global Ranking</h2>
+          <div className="h-px w-24 bg-amber-500/30 mx-auto" />
+        </motion.div>
+
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p className="text-2xl text-zinc-400 mb-4 font-space">You are in the</p>
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-white mb-6">
+            Top {percentile}%
+          </h1>
+          <p className="text-xl text-zinc-500 font-space uppercase tracking-widest">
+            of Solana Holders
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-16 inline-block"
+        >
+          <div className="px-8 py-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-sm">
+            <p className="font-space text-sm text-amber-500/70 uppercase tracking-wider mb-2">Rank Title</p>
+            <p className="text-3xl font-bold text-amber-400">{label}</p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
