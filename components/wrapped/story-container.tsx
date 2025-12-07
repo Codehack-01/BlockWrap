@@ -53,8 +53,9 @@ export function StoryContainer({ slides, onComplete }: StoryContainerProps) {
             className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden"
           >
             <motion.div
+              key={`progress-${index}-${currentIndex}`}
               className="h-full bg-white"
-              initial={{ width: "0%" }}
+              initial={{ width: index < currentIndex ? "100%" : "0%" }}
               animate={{
                 width:
                   index < currentIndex

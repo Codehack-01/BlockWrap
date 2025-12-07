@@ -44,7 +44,7 @@ export function IntroSlide({ data }: SlideProps) {
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
         >
-          <span className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 tracking-tight block mt-[-2rem] ml-2">
+          <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 tracking-tight block mt-[-2rem] ml-2">
             WRAPPED
           </span>
         </motion.div>
@@ -520,7 +520,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white">Money Moves</h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -543,9 +543,9 @@ export function InflowOutflowSlide({ data }: SlideProps) {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-left pl-8 md:pl-0 "
+            className="text-left pl-8 md:pl-0"
           >
-            <div className="flex items-center gap-3 mb-4 ">
+            <div className="flex items-center gap-3 mb-4">
               <ArrowUpRight className="h-5 w-5 text-red-500" />
               <span className="font-space text-sm uppercase tracking-widest text-red-500">Outflow</span>
             </div>
@@ -841,7 +841,7 @@ export function ShareSlide({ data }: SlideProps) {
   };
 
   return (
-    <div ref={slideRef} className="h-full w-full flex flex-col p-6 md:p-8 relative overflow-hidden bg-zinc-950 font-syne text-white">
+    <div ref={slideRef} className="flex flex-col p-6 md:p-8 relative overflow-hidden bg-zinc-950 font-syne text-white">
       {/* Background Decor */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
@@ -849,7 +849,7 @@ export function ShareSlide({ data }: SlideProps) {
       {/* Header */}
       <div className="relative z-10 flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-4xl font-bold tracking-tighter mb-1">2025 Wrapped</h1>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tighter mb-1">2025 Wrapped</h1>
           <p className="font-space text-zinc-500 text-sm tracking-wider uppercase">{data.address.slice(0, 4)}...{data.address.slice(-4)}</p>
         </div>
         <div className="text-right">
@@ -871,7 +871,7 @@ export function ShareSlide({ data }: SlideProps) {
                <span className="text-xs font-space uppercase tracking-wider">Total Volume</span>
              </div>
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-               <p className="text-5xl md:text-6xl font-bold tracking-tighter text-white">
+               <p className="text-4xl md:text-5xl font-bold tracking-tighter text-white">
                  ${data.totalVolume.toLocaleString()}
                </p>
                <div className="md:text-right">
@@ -902,7 +902,7 @@ export function ShareSlide({ data }: SlideProps) {
                <Trophy className="w-4 h-4" />
                <span className="text-xs font-space uppercase tracking-wider">Rank</span>
              </div>
-             <p className="text-3xl font-bold text-white mb-1">Top {percentile}%</p>
+             <p className="text-2xl md:text-3xl font-bold text-white mb-1">Top {percentile}%</p>
              <p className="text-xs text-amber-500/60 font-space uppercase">{label}</p>
            </div>
         </div>

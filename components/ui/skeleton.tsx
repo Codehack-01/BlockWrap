@@ -188,7 +188,7 @@ export function WrapLoadingSkeleton() {
         {/* Progress steps (Terminal style) */}
         <div className="mt-8 space-y-2 w-64 font-mono text-xs">
           <LoadingStep text="> Accessing blockchain data..." delay={0} />
-          <LoadingStep text="> Decrypting wallet history..." delay={800} />
+          <LoadingStep text="> Analyzing wallet activity..." delay={800} />
           <LoadingStep text="> Identifying patterns..." delay={1600} />
           <LoadingStep text="> Generating report..." delay={2400} />
         </div>
