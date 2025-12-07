@@ -789,10 +789,12 @@ export function ShareSlide({ data }: SlideProps) {
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
 
+      const isMobile = window.innerWidth < 768;
       const dataUrl = await toPng(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node) => !node.classList?.contains("no-capture"),
+        style: isMobile ? { height: 'auto',  minHeight: 'auto', flex: 'none' } : undefined,
       });
 
       const link = document.createElement("a");
@@ -812,10 +814,12 @@ export function ShareSlide({ data }: SlideProps) {
 
     setIsSharing(true);
     try {
+      const isMobile = window.innerWidth < 768;
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node) => !node.classList?.contains("no-capture"),
+        style: isMobile ? { height: 'auto', minHeight: 'auto', flex: 'none' } : undefined,
       });
 
       if (!blob) throw new Error("Failed to generate image blob");
