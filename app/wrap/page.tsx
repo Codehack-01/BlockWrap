@@ -107,7 +107,7 @@ function WrapContent() {
   ];
 
   return (
-    <div className="h-screen w-full bg-black text-white overflow-hidden relative font-syne">
+    <div className="fixed inset-0 h-[100dvh] w-full bg-black text-white overflow-hidden overscroll-none touch-none font-syne">
       <GrainOverlay />
       <StoryContainer
         slides={slides}

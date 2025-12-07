@@ -44,7 +44,7 @@ export function StoryContainer({ slides, onComplete }: StoryContainerProps) {
   }, [currentIndex, isPaused, nextSlide, slides.length]);
 
   return (
-    <div className="relative h-screen w-full bg-black text-white overflow-hidden flex items-center justify-center">
+    <div className="relative h-full w-full bg-black text-white overflow-hidden flex items-center justify-center overscroll-none touch-none">
       {/* Progress Bars */}
       <div className="absolute top-4 left-0 right-0 z-50 flex gap-2 px-4">
         {slides.map((_, index) => (

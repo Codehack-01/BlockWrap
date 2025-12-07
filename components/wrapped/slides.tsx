@@ -790,11 +790,24 @@ export function ShareSlide({ data }: SlideProps) {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const isMobile = window.innerWidth < 768;
+      
       const dataUrl = await toPng(slideRef.current, {
         cacheBust: true,
+        pixelRatio: 3,
         backgroundColor: "#09090b",
         filter: (node) => !node.classList?.contains("no-capture"),
-        style: isMobile ? { height: 'auto',  minHeight: 'auto', flex: 'none' } : undefined,
+        width: isMobile ? slideRef.current.clientWidth : undefined,
+        style: isMobile ? { 
+          height: 'auto',
+          minHeight: '850px', // Force it to be tall/big
+          width: '100%',
+          overflow: 'visible',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: '3rem',
+          paddingBottom: '3rem'
+          // removed justify-between so footer stays near content
+        } : undefined,
       });
 
       const link = document.createElement("a");
@@ -815,11 +828,23 @@ export function ShareSlide({ data }: SlideProps) {
     setIsSharing(true);
     try {
       const isMobile = window.innerWidth < 768;
+      
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
+        pixelRatio: 3,
         backgroundColor: "#09090b",
         filter: (node) => !node.classList?.contains("no-capture"),
-        style: isMobile ? { height: 'auto', minHeight: 'auto', flex: 'none' } : undefined,
+        width: isMobile ? slideRef.current.clientWidth : undefined,
+        style: isMobile ? { 
+          height: 'auto',
+          minHeight: '850px',
+          width: '100%',
+          overflow: 'visible',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: '3rem',
+          paddingBottom: '3rem'
+        } : undefined,
       });
 
       if (!blob) throw new Error("Failed to generate image blob");
@@ -845,27 +870,27 @@ export function ShareSlide({ data }: SlideProps) {
   };
 
   return (
-    <div ref={slideRef} className="flex flex-col p-6 md:p-8 relative overflow-hidden bg-zinc-950 font-syne text-white">
+    <div ref={slideRef} className="h-full w-full flex flex-col p-5 md:p-8 relative overflow-hidden bg-zinc-950 font-syne text-white">
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-purple-600/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
       
       {/* Header */}
-      <div className="relative z-10 flex justify-between items-start mb-6">
+      <div className="relative z-10 flex justify-between items-start mb-3 md:mb-6 flex-shrink-0">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tighter mb-1">2025 Wrapped</h1>
-          <p className="font-space text-zinc-500 text-sm tracking-wider uppercase">{data.address.slice(0, 4)}...{data.address.slice(-4)}</p>
+          <h1 className="text-xl md:text-4xl font-bold tracking-tighter mb-0.5 md:mb-1">2025 Wrapped</h1>
+          <p className="font-space text-zinc-500 text-[10px] md:text-sm tracking-wider uppercase">{data.address.slice(0, 4)}...{data.address.slice(-4)}</p>
         </div>
-        <div className="text-right">
-           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
-             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-             <span className="text-xs font-space text-zinc-400">ON-CHAIN</span>
+        <div className="text-right flex flex-col items-end gap-1">
+           <div className="inline-flex items-center gap-1 md:gap-2 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-white/5 border border-white/10">
+             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse" />
+             <span className="text-[8px] md:text-xs font-space text-zinc-400">ON-CHAIN</span>
            </div>
         </div>
       </div>
 
       {/* Grid Content */}
-      <div className="relative z-10 flex-1 grid grid-cols-2 gap-4">
+      <div className="relative z-10 flex-1 min-h-0 grid grid-cols-2 grid-rows-[auto_1fr_1fr] gap-2 md:gap-4 pb-16 md:pb-20">
         {/* Total Volume - Big Block */}
         <div className="col-span-2 bg-gradient-to-br from-purple-900/40 to-black border border-purple-500/20 rounded-3xl p-6 relative overflow-hidden group">
           <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors" />
@@ -946,11 +971,9 @@ export function ShareSlide({ data }: SlideProps) {
       {/* Footer Branding */}
       <div className="mt-6 flex justify-between items-end relative z-10">
          <div className="flex flex-col">
-            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">BlockWrap</span>
-            <span className="text-[10px] text-white font-space tracking-wider">blockwrap.xyz</span>
+            <span className="text-xs font-bold text-white font-space tracking-wider">blockwrap.xyz</span>
          </div>
       </div>
-
       {/* Action Bar */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
