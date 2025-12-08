@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { WalletData } from "@/lib/mock-data";
-// import { IntroSlide, VolumeSlide, TopAssetSlide, PersonalitySlide, InflowOutflowSlide } from "./slides";
 // import { useRouter } from "next/navigation";
 
 interface StoryContainerProps {

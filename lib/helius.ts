@@ -158,11 +158,20 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     // Note: We REMOVED the 2025 check here so we can count older transactions for the "Total" metric.
     // We will still filter for 2025 later for the detailed stats.
 
-    let signatures: any[] = [];
+    interface SignatureInfo {
+        signature: string;
+        slot: number;
+        err: Record<string, unknown> | null;
+        memo: string | null;
+        blockTime: number;
+        confirmationStatus?: string;
+    }
+
+    let signatures: SignatureInfo[] = [];
     let beforeSignature: string | undefined = undefined;
 
     while (signatures.length < MAX_SIGNATURES) {
-        const params: any[] = [address, { limit: 1000 }];
+        const params: [string, { limit: number; before?: string }] = [address, { limit: 1000 }];
         if (beforeSignature) {
             params[1].before = beforeSignature;
         }

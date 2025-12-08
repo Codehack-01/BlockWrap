@@ -1,11 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
 import { formatTransactionCount } from "@/lib/utils";
-import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2, RotateCcw } from "lucide-react";
-import { WrapCard } from "@/components/shared/wrap-card";
+import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2 } from "lucide-react";
 import { toBlob, toPng } from "html-to-image";
 
 interface SlideProps {

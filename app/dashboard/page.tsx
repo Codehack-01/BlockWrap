@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getMockData, WalletData } from "@/lib/mock-data";
+import { WalletData } from "@/lib/mock-data";
 import { formatTransactionCount } from "@/lib/utils";
 import { fetchWalletData } from "@/app/actions";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
@@ -11,9 +11,8 @@ import { TransactionTable } from "@/components/dashboard/transaction-table";
 import { CryptoTicker } from "@/components/dashboard/crypto-ticker";
 import { WrapModal } from "@/components/shared/wrap-modal";
 import { DashboardSkeleton } from "@/components/ui/skeleton";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Share2, RotateCcw, Wallet, DollarSign, Activity, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, DollarSign, Activity, ArrowLeft, Share2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function DashboardContent() {

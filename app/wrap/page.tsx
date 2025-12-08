@@ -18,7 +18,7 @@ import {
   ShareSlide 
 } from "@/components/wrapped/slides";
 import { GrainOverlay } from "@/components/wrapped/grain-overlay";
-import { getMockData, WalletData } from "@/lib/mock-data";
+import { WalletData } from "@/lib/mock-data";
 import { fetchWalletData } from "@/app/actions";
 import { WrapLoadingSkeleton } from "@/components/ui/skeleton";
 
