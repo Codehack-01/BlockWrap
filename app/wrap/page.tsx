@@ -40,19 +40,15 @@ function WrapContent() {
         const walletData = await fetchWalletData(address);
         setData(walletData);
       } catch (err: unknown) {
-        if (err instanceof Error && err.message === "INVALID_WALLET_ADDRESS") {
-          setError("INVALID_WALLET_ADDRESS");
-        } else {
-          console.error("API Error, falling back to mock:", err);
-          setData(getMockData(address));
-        }
+        console.error("API Error:", err);
+        setError("FAILED");
       }
     };
 
     loadData();
   }, [address, router]);
 
-  if (error === "INVALID_WALLET_ADDRESS") {
+  if (error) {
     return (
       <div className="h-screen w-full bg-black text-white flex items-center justify-center font-syne relative overflow-hidden">
         <GrainOverlay />

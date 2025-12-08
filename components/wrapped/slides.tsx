@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
-import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2 } from "lucide-react";
+import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2, RotateCcw } from "lucide-react";
 import { WrapCard } from "@/components/shared/wrap-card";
 import { toBlob, toPng } from "html-to-image";
 
@@ -149,6 +149,8 @@ export function TopAssetSlide({ data }: SlideProps) {
 
     setIsSharing(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for watermark render
+
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
@@ -235,7 +237,7 @@ export function TopAssetSlide({ data }: SlideProps) {
         <button
           onClick={handleShare}
           disabled={isSharing}
-          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50 shadow-lg shadow-white/10"
         >
           {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
           <span className="hidden md:inline">Share</span>
@@ -250,6 +252,13 @@ export function TopAssetSlide({ data }: SlideProps) {
           <span className="hidden md:inline">Save</span>
         </button>
       </motion.div>
+
+      {/* Watermark - Only visible during capture */}
+      {(isSharing || isDownloading) && (
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+          blockwrap.xyz
+        </div>
+      )}
     </div>
   );
 }
@@ -308,6 +317,14 @@ export function TopAssetsSlide({ data }: SlideProps) {
 
 export function TopWalletsSlide({ data }: SlideProps) {
   const topWallets = data.topWallets || [];
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+
+  const handleCopy = (address: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(address);
+    setCopiedAddress(address);
+    setTimeout(() => setCopiedAddress(null), 1500);
+  };
 
   if (topWallets.length === 0) {
     return (
@@ -346,21 +363,29 @@ export function TopWalletsSlide({ data }: SlideProps) {
           <h2 className="text-3xl md:text-5xl font-bold tracking-tighter text-white">Top 5 Transactions</h2>
         </motion.div>
 
-        <div className="space-y-0">
+        <div className="space-y-0 relative">
           {topWallets.map((wallet, index) => (
             <motion.div
               key={wallet.address}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
-              className="group flex items-center justify-between py-3 border-b border-zinc-800 hover:border-cyan-500/50 transition-colors duration-500"
+              onClick={(e) => handleCopy(wallet.address, e)}
+              className="group flex items-center justify-between py-3 border-b border-zinc-800 hover:border-cyan-500/50 transition-colors duration-500 cursor-pointer"
             >
               <div className="flex items-center gap-6 min-w-0 flex-1">
                 <span className="font-space text-sm text-zinc-600">0{index + 1}</span>
                 <div className="min-w-0">
-                  <h3 className="text-lg md:text-xl font-bold text-zinc-300 group-hover:text-white transition-colors duration-300 truncate font-mono">
-                    {wallet.address.slice(0, 4)}...{wallet.address.slice(-4)}
-                  </h3>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-lg md:text-xl font-bold text-zinc-300 group-hover:text-white transition-colors duration-300 truncate font-mono">
+                      {wallet.address.slice(0, 4)}...{wallet.address.slice(-4)}
+                    </h3>
+                    {copiedAddress === wallet.address && (
+                      <span className="text-emerald-400 text-xs font-bold tracking-wider font-space animate-in fade-in slide-in-from-left-2 duration-300">
+                        COPIED
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] uppercase tracking-wider text-zinc-500 font-space">
                       {getTypeLabel(wallet.type)}
@@ -379,6 +404,7 @@ export function TopWalletsSlide({ data }: SlideProps) {
               </div>
             </motion.div>
           ))}
+
         </div>
       </div>
     </div>
@@ -471,6 +497,8 @@ export function InflowOutflowSlide({ data }: SlideProps) {
 
     setIsSharing(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for watermark render
+
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
@@ -570,7 +598,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
         <button
           onClick={handleShare}
           disabled={isSharing}
-          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50 shadow-lg shadow-white/10"
         >
           {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
           <span className="hidden md:inline">Share</span>
@@ -585,6 +613,13 @@ export function InflowOutflowSlide({ data }: SlideProps) {
           <span className="hidden md:inline">Save</span>
         </button>
       </motion.div>
+
+      {/* Watermark - Only visible during capture */}
+      {(isSharing || isDownloading) && (
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+          blockwrap.xyz
+        </div>
+      )}
     </div>
   );
 }
@@ -633,11 +668,25 @@ export function MostActiveDaySlide({ data }: SlideProps) {
 }
 
 export function BiggestTransactionSlide({ data }: SlideProps) {
-  const { amount, currency, to, date, usdValue } = data.biggestTransaction || { amount: 0, currency: "SOL", to: "Unknown", date: "N/A", usdValue: 0 };
-  
   const slideRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+
+  const { amount, currency, usdValue, to, date } = data.biggestTransaction || { 
+    amount: 1250, 
+    currency: "SOL", 
+    usdValue: 275000, 
+    to: "8x2...9z1", 
+    date: "Jan 12, 2024" 
+  };
+
+  const handleCopy = (address: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(address);
+    setCopiedAddress(address);
+    setTimeout(() => setCopiedAddress(null), 1500);
+  };
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -645,20 +694,22 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
 
     setIsDownloading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for render
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for watermark render
 
-      const dataUrl = await toPng(slideRef.current, {
+      const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node) => !node.classList?.contains("no-capture"),
       });
 
+      if (!blob) throw new Error("Failed to generate image blob");
+
       const link = document.createElement("a");
-      link.download = `blockwrap-biggest-tx-${Date.now()}.png`;
-      link.href = dataUrl;
+      link.download = "biggest-tx.png";
+      link.href = URL.createObjectURL(blob);
       link.click();
     } catch (err) {
-      console.error("Capture failed:", err);
+      console.error("Download failed:", err);
     } finally {
       setIsDownloading(false);
     }
@@ -670,6 +721,8 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
 
     setIsSharing(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for watermark render
+
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
@@ -735,10 +788,18 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
           className="mt-8"
         >
           <p className="font-space text-sm text-zinc-500 uppercase tracking-wider mb-2">Sent to</p>
-          <div className="inline-block border border-zinc-800 bg-zinc-900/50 px-6 py-3 rounded-full backdrop-blur-sm">
-            <p className="font-space text-xl text-zinc-300 font-mono">
+          <div 
+            onClick={(e) => handleCopy(to, e)}
+            className="inline-flex items-center gap-3 border border-zinc-800 bg-zinc-900/50 px-6 py-3 rounded-full backdrop-blur-sm cursor-pointer hover:bg-zinc-800 transition-colors group"
+          >
+            <p className="font-space text-xl text-zinc-300 font-mono group-hover:text-white transition-colors">
               {to.length > 10 ? `${to.slice(0, 4)}...${to.slice(-4)}` : to}
             </p>
+            {copiedAddress === to && (
+              <span className="text-emerald-400 text-xs font-bold tracking-wider font-space animate-in fade-in slide-in-from-left-2 duration-300">
+                COPIED
+              </span>
+            )}
           </div>
           <p className="font-space text-xs text-zinc-600 mt-4">{date}</p>
         </motion.div>
@@ -755,7 +816,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
         <button
           onClick={handleShare}
           disabled={isSharing}
-          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50 shadow-lg shadow-white/10"
         >
           {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
           <span className="hidden md:inline">Share</span>
@@ -770,6 +831,13 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
           <span className="hidden md:inline">Save</span>
         </button>
       </motion.div>
+
+      {/* Watermark - Only visible during capture */}
+      {(isSharing || isDownloading) && (
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+          blockwrap.xyz
+        </div>
+      )}
     </div>
   );
 }
@@ -827,6 +895,8 @@ export function ShareSlide({ data }: SlideProps) {
 
     setIsSharing(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for watermark render
+
       const isMobile = window.innerWidth < 768;
       
       const blob = await toBlob(slideRef.current, {
@@ -889,10 +959,11 @@ export function ShareSlide({ data }: SlideProps) {
         </div>
       </div>
 
-      {/* Grid Content */}
-      <div className="relative z-10 flex-1 min-h-0 grid grid-cols-2 grid-rows-[auto_1fr_1fr] gap-2 md:gap-4 pb-16 md:pb-20">
-        {/* Total Volume - Big Block */}
-        <div className="col-span-2 bg-gradient-to-br from-purple-900/40 to-black border border-purple-500/20 rounded-3xl p-6 relative overflow-hidden group">
+      {/* Content Container - Switched to Flex for better height control */}
+      <div className="relative z-10 flex-1 min-h-0 flex flex-col gap-2 md:gap-4 pb-16 md:pb-20">
+        
+        {/* Total Volume - Takes natural height */}
+        <div className="w-full bg-gradient-to-br from-purple-900/40 to-black border border-purple-500/20 rounded-3xl p-6 relative overflow-hidden group flex-shrink-0">
           <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors" />
           <div className="relative z-10">
              <div className="flex items-center gap-2 mb-2 text-purple-300">
@@ -911,69 +982,67 @@ export function ShareSlide({ data }: SlideProps) {
           </div>
         </div>
 
-        {/* Top Asset */}
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5 flex flex-col justify-between">
-           <div className="flex items-center gap-2 text-zinc-400 mb-2">
-             <Coins className="w-4 h-4" />
-             <span className="text-xs font-space uppercase tracking-wider">Top Asset</span>
-           </div>
-           <div>
-             <p className="text-3xl font-bold text-white mb-1">{data.topAsset.symbol}</p>
-             <p className="text-sm text-zinc-500 font-space">${data.topAsset.valueUsd.toLocaleString()} Value</p>
-           </div>
-        </div>
+        {/* 2x2 Grid for the rest - Fills remaining space */}
+        <div className="flex-1 grid grid-cols-2 gap-2 md:gap-4 min-h-0">
+            {/* Top Asset */}
+            <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5 flex flex-col justify-between">
+               <div className="flex items-center gap-2 text-zinc-400 mb-2">
+                 <Coins className="w-4 h-4" />
+                 <span className="text-xs font-space uppercase tracking-wider">Top Asset</span>
+               </div>
+               <div>
+                 <p className="text-3xl font-bold text-white mb-1">{data.topAsset.symbol}</p>
+                 <p className="text-sm text-zinc-500 font-space">${data.topAsset.valueUsd.toLocaleString()} Value</p>
+               </div>
+            </div>
 
-        {/* Global Rank */}
-        <div className="bg-zinc-900/60 border border-amber-500/20 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden">
-           <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 blur-2xl rounded-full" />
-           <div className="relative z-10">
-             <div className="flex items-center gap-2 text-amber-500/80 mb-2">
-               <Trophy className="w-4 h-4" />
-               <span className="text-xs font-space uppercase tracking-wider">Rank</span>
-             </div>
-             <p className="text-2xl md:text-3xl font-bold text-white mb-1">Top {percentile}%</p>
-             <p className="text-xs text-amber-500/60 font-space uppercase">{label}</p>
-           </div>
-        </div>
+            {/* Global Rank */}
+            <div className="bg-zinc-900/60 border border-amber-500/20 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 blur-2xl rounded-full" />
+               <div className="relative z-10">
+                 <div className="flex items-center gap-2 text-amber-500/80 mb-2">
+                   <Trophy className="w-4 h-4" />
+                   <span className="text-xs font-space uppercase tracking-wider">Rank</span>
+                 </div>
+                 <p className="text-2xl md:text-3xl font-bold text-white mb-1">Top {percentile}%</p>
+                 <p className="text-xs text-amber-500/60 font-space uppercase">{label}</p>
+               </div>
+            </div>
 
-        {/* Net Flow */}
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
-           <div className="flex items-center gap-2 text-zinc-400 mb-4">
-             <ArrowRightLeft className="w-4 h-4" />
-             <span className="text-xs font-space uppercase tracking-wider">Net Flow</span>
-           </div>
-           <div className="space-y-3">
-             <div className="flex justify-between items-center">
-               <span className="text-xs text-zinc-500">In</span>
-               <span className="text-sm font-bold text-green-400">+${data.totalInflowUsd?.toLocaleString() ?? "0"}</span>
-             </div>
-             <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
-               <div className="h-full bg-green-500/50 w-[70%]" />
-             </div>
-             <div className="flex justify-between items-center">
-               <span className="text-xs text-zinc-500">Out</span>
-               <span className="text-sm font-bold text-red-400">-${data.totalOutflowUsd?.toLocaleString() ?? "0"}</span>
-             </div>
-              <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
-               <div className="h-full bg-red-500/50 w-[40%]" />
-             </div>
-           </div>
-        </div>
+            {/* Net Flow */}
+            <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
+               <div className="flex items-center gap-2 text-zinc-400 mb-4">
+                 <ArrowRightLeft className="w-4 h-4" />
+                 <span className="text-xs font-space uppercase tracking-wider">Net Flow</span>
+               </div>
+               <div className="space-y-3">
+                 <div className="flex justify-between items-center">
+                   <span className="text-xs text-zinc-500">In</span>
+                   <span className="text-sm font-bold text-green-400">+${data.totalInflowUsd?.toLocaleString() ?? "0"}</span>
+                 </div>
+                 <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                   <div className="h-full bg-green-500/50 w-[70%]" />
+                 </div>
+                 <div className="flex justify-between items-center">
+                   <span className="text-xs text-zinc-500">Out</span>
+                   <span className="text-sm font-bold text-red-400">-${data.totalOutflowUsd?.toLocaleString() ?? "0"}</span>
+                 </div>
+                  <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                   <div className="h-full bg-red-500/50 w-[40%]" />
+                 </div>
+               </div>
+            </div>
 
-        {/* Personality */}
-        <div className="bg-gradient-to-br from-pink-900/40 to-black border border-pink-500/20 rounded-3xl p-5 flex flex-col justify-center items-center text-center">
-            <Sparkles className="w-6 h-6 text-pink-400 mb-2" />
-            <p className="text-lg font-bold text-white">{data.personality}</p>
-            <p className="text-[10px] text-pink-400/60 uppercase tracking-widest mt-1">Vibe Check</p>
+            {/* Personality */}
+            <div className="bg-gradient-to-br from-pink-900/40 to-black border border-pink-500/20 rounded-3xl p-5 flex flex-col justify-center items-center text-center">
+                <Sparkles className="w-6 h-6 text-pink-400 mb-2" />
+                <p className="text-lg font-bold text-white">{data.personality}</p>
+                <p className="text-[10px] text-pink-400/60 uppercase tracking-widest mt-1">Vibe Check</p>
+            </div>
         </div>
       </div>
 
-      {/* Footer Branding */}
-      <div className="mt-6 flex justify-between items-end relative z-10">
-         <div className="flex flex-col">
-            <span className="text-xs font-bold text-white font-space tracking-wider">blockwrap.xyz</span>
-         </div>
-      </div>
+
       {/* Action Bar */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -988,18 +1057,26 @@ export function ShareSlide({ data }: SlideProps) {
           className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50 shadow-lg shadow-white/10"
         >
           {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
-          <span>Share</span>
+          <span className="hidden md:inline">Share</span>
         </button>
 
         <button
           onClick={handleDownload}
           disabled={isDownloading}
-          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/90 backdrop-blur-md border border-zinc-700 rounded-full text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
         >
           {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-          <span>Save</span>
+          <span className="hidden md:inline">Save</span>
         </button>
       </motion.div>
+
+
+      {/* Watermark - Only visible during capture */}
+      {(isSharing || isDownloading) && (
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+          blockwrap.xyz
+        </div>
+      )}
     </div>
   );
 }

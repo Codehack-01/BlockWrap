@@ -12,7 +12,7 @@ import { WrapModal } from "@/components/shared/wrap-modal";
 import { DashboardSkeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, DollarSign, Activity, ArrowLeft, Share2 } from "lucide-react";
+import { Wallet, DollarSign, Activity, ArrowLeft, Share2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function DashboardContent() {
@@ -24,6 +24,7 @@ function DashboardContent() {
   const [filteredData, setFilteredData] = useState<WalletData | null>(null);
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!address) {
@@ -38,10 +39,8 @@ function DashboardContent() {
         setData(walletData);
         setFilteredData(walletData);
       } catch (err) {
-        console.error("API Error, falling back to mock:", err);
-        const mock = getMockData(address);
-        setData(mock);
-        setFilteredData(mock);
+        console.error("API Error:", err);
+        setError("Failed to load wallet data");
       } finally {
         setIsLoading(false);
       }
@@ -135,8 +134,27 @@ function DashboardContent() {
 
   }, [selectedMonth, data]);
 
-  if (isLoading || !filteredData) {
+  if (isLoading) {
     return <DashboardSkeleton />;
+  }
+
+  if (error || !filteredData) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-screen bg-background font-outfit p-8">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
+            <Activity className="h-8 w-8 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold">Failed to load data</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            We couldn&apos;t fetch data for this wallet. It might be invalid or has no activity in 2025.
+          </p>
+          <Button onClick={() => router.push("/")}>
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const months = [
@@ -182,6 +200,9 @@ function DashboardContent() {
           <Button variant="outline" onClick={() => setIsWrapModalOpen(true)} className="hidden sm:flex">
             <Share2 className="h-4 w-4 mr-2" />
             Share Wrap
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => router.push(`/wrap?address=${address}`)} className="sm:hidden">
+            <RotateCcw className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="icon" onClick={() => setIsWrapModalOpen(true)} className="sm:hidden">
             <Share2 className="h-4 w-4" />

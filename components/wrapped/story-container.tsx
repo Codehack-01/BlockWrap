@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
 // import { IntroSlide, VolumeSlide, TopAssetSlide, PersonalitySlide, InflowOutflowSlide } from "./slides";

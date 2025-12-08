@@ -44,7 +44,7 @@ export function ChartSkeleton() {
           <Skeleton className="h-8 w-8 rounded-md" />
         </div>
       </div>
-      <div className="flex items-end gap-2 h-[300px]">
+      <div className="flex items-end gap-2 h-[350px]">
         {Array.from({ length: 12 }).map((_, i) => (
           <Skeleton 
             key={i} 
@@ -66,7 +66,7 @@ export function TransactionSkeleton() {
         <Skeleton className="h-4 w-16" />
       </div>
       <div className="space-y-4">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="flex items-center gap-4">
             <Skeleton className="h-10 w-10 rounded-full" />
             <div className="flex-1 space-y-2">
@@ -105,7 +105,7 @@ export function DashboardSkeleton() {
             <Skeleton className="h-10 w-10 rounded-md" />
             <Skeleton className="h-8 w-40" />
           </div>
-          <div className="flex gap-2">
+          <div className="hidden sm:flex gap-2">
             <Skeleton className="h-10 w-32 rounded-md" />
             <Skeleton className="h-10 w-28 rounded-md" />
             <Skeleton className="h-10 w-36 rounded-md" />
