@@ -152,22 +152,51 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         }
     });
 
-    // 2. Fetch Signatures for accurate count (up to 1000)
-    const signaturesResponse = await fetch(RPC_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: "get-signatures",
-            method: "getSignaturesForAddress",
-            params: [
-                address,
-                { limit: 1000 }
-            ],
-        }),
-    });
-    const signaturesJson = await signaturesResponse.json();
-    const signatures = signaturesJson.result || [];
+    // 2. Fetch Signatures (Pagination enabled)
+    // Fetch up to 10,000 transactions to get a deeper "Total Transactions" count
+    const MAX_SIGNATURES = 10000;
+    // Note: We REMOVED the 2025 check here so we can count older transactions for the "Total" metric.
+    // We will still filter for 2025 later for the detailed stats.
+
+    let signatures: any[] = [];
+    let beforeSignature: string | undefined = undefined;
+
+    while (signatures.length < MAX_SIGNATURES) {
+        const params: any[] = [address, { limit: 1000 }];
+        if (beforeSignature) {
+            params[1].before = beforeSignature;
+        }
+
+        try {
+            const signaturesResponse = await fetch(RPC_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    jsonrpc: "2.0",
+                    id: "get-signatures",
+                    method: "getSignaturesForAddress",
+                    params: params,
+                }),
+            });
+            const signaturesJson = await signaturesResponse.json();
+            const batch = signaturesJson.result || [];
+
+            if (batch.length === 0) break;
+
+            signatures = signatures.concat(batch);
+            beforeSignature = batch[batch.length - 1].signature;
+
+            // REMOVED: Date check. We want to count them all up to the limit.
+
+            // If we got fewer than requested, we reached the end of history
+            if (batch.length < 1000) break;
+
+        } catch (e) {
+            console.error("Error fetching signatures batch:", e);
+            break;
+        }
+    }
+
     const transactionCount = signatures.length;
 
     // Calculate Month Change (Transactions in last 30 days)
@@ -439,9 +468,57 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
     // Determine Personality
     let personality: WalletData["personality"] = "The HODLer";
-    if (history.length > 100) personality = "The Trader";
-    if (history.some(tx => tx.type === "NFT_SALE" || tx.type === "NFT_BID")) personality = "The NFT Collector";
-    if (history.length > 500) personality = "The Degen";
+
+    // Metrics for personality
+    const txCount = transactionCount; // Total signatures
+    // We need to ensure solPrice is available. It comes from assetsJson.
+    const solPrice = assetsJson.result?.nativeBalance?.price_per_sol || 0;
+    const solVolUsd = totalVolume * solPrice; // Approx USD volume of SOL moves
+
+    // 1. Time based & Type based
+    let nightTxCount = 0;
+    let weekendTxCount = 0;
+    let nftTxCount = 0;
+    let nonSolTokenTxCount = 0;
+
+    history.forEach(tx => {
+        const date = new Date((tx.timestamp || 0) * 1000);
+        const hour = date.getHours();
+        const day = date.getDay(); // 0 = Sun, 6 = Sat
+
+        if (hour >= 0 && hour < 6) nightTxCount++;
+        if (day === 0 || day === 6) weekendTxCount++;
+
+        if (tx.type === "NFT_SALE" || tx.type === "NFT_BID") nftTxCount++;
+
+        // rudimentary check for SPL tokens
+        if (tx.tokenTransfers && tx.tokenTransfers.length > 0) {
+            nonSolTokenTxCount++;
+        }
+    });
+
+    const isNightOwl = history.length > 0 && (nightTxCount / history.length > 0.5);
+    const isWeekender = history.length > 0 && (weekendTxCount / history.length > 0.5);
+    const isSolanaMaxi = nonSolTokenTxCount === 0 && totalVolume > 0; // Pure SOL mover
+
+    // Determining Archetype (Precedence Order)
+    if (txCount >= 1000) {
+        personality = "The Bot?";
+    } else if (solVolUsd > 50000 && txCount < 20) {
+        personality = "The Diamond Hands";
+    } else if (nonSolTokenTxCount > 500) {
+        personality = "The Degen";
+    } else if (nftTxCount > 0) {
+        personality = "The NFT Collector";
+    } else if (isNightOwl) {
+        personality = "The Night Owl";
+    } else if (isWeekender) {
+        personality = "The Weekender";
+    } else if (isSolanaMaxi && txCount > 10) {
+        personality = "The Solana Maxi";
+    } else if (txCount > 100) {
+        personality = "The Trader";
+    }
 
     // Calculate Percentage Change
     let volumeChangePercentage = 0;
@@ -452,18 +529,17 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     }
 
     // Calculate USD values
-    // We already fetched the native balance which includes price_per_sol
-    const solPrice = assetsJson.result?.nativeBalance?.price_per_sol || 0;
+    // solPrice is already defined above
     const totalInflowUsd = totalInflow * solPrice;
     const totalOutflowUsd = totalOutflow * solPrice;
 
-    // Calculate Rank
+    // Calculate Rank (Based on ~11.5M wallets estimates)
     const calculateRank = (solBalance: number) => {
-        if (solBalance >= 10000) return { percentile: 0.01, label: "Solana Whale" };
-        if (solBalance >= 1000) return { percentile: 0.1, label: "Solana Titan" };
-        if (solBalance >= 100) return { percentile: 1, label: "Solana Shark" };
-        if (solBalance >= 10) return { percentile: 5, label: "Solana Dolphin" };
-        if (solBalance >= 1) return { percentile: 20, label: "Solana Fish" };
+        if (solBalance >= 1000) return { percentile: 0.2, label: "Solana Whale Shark" };
+        if (solBalance >= 100) return { percentile: 1.3, label: "Solana Whale" };
+        if (solBalance >= 20) return { percentile: 5, label: "Solana Dolphin" };
+        if (solBalance >= 10) return { percentile: 7, label: "Solana Fish" };
+        if (solBalance >= 1) return { percentile: 28, label: "Solana Shrimp" };
         return { percentile: 50, label: "Solana Plankton" };
     };
 

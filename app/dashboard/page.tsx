@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getMockData, WalletData } from "@/lib/mock-data";
+import { formatTransactionCount } from "@/lib/utils";
 import { fetchWalletData } from "@/app/actions";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { TransactionTable } from "@/components/dashboard/transaction-table";
@@ -243,7 +244,7 @@ function DashboardContent() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{filteredData.transactionCount}</div>
+            <div className="text-2xl font-bold">{formatTransactionCount(filteredData.transactionCount)}</div>
             <p className="text-xs text-muted-foreground">
               {filteredData.monthChange !== undefined ? `+${filteredData.monthChange} since last month` : "No recent activity"}
             </p>

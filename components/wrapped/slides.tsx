@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WalletData } from "@/lib/mock-data";
+import { formatTransactionCount } from "@/lib/utils";
 import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2, RotateCcw } from "lucide-react";
 import { WrapCard } from "@/components/shared/wrap-card";
 import { toBlob, toPng } from "html-to-image";
@@ -67,7 +68,19 @@ export function IntroSlide({ data }: SlideProps) {
   );
 }
 
+
+function getVolumeStatus(volume: number): string {
+  if (volume < 100) return "Normie";
+  if (volume < 1000) return "Plankton";
+  if (volume < 10000) return "Shrimp";
+  if (volume < 50000) return "Dolphin";
+  if (volume < 250000) return "Whale";
+  return "Whale Shark";
+}
+
 export function VolumeSlide({ data }: SlideProps) {
+  const status = getVolumeStatus(data.totalVolume);
+
   return (
     <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
       <div className="absolute bottom-[-20%] left-[-20%] w-[800px] h-[800px] bg-purple-600/20 blur-[150px] rounded-full mix-blend-screen pointer-events-none" />
@@ -105,7 +118,7 @@ export function VolumeSlide({ data }: SlideProps) {
           </div>
           <div>
             <p className="font-space text-xs text-zinc-500 uppercase tracking-wider mb-1">Status</p>
-            <p className="font-space text-xl text-purple-400">Whale Activity</p>
+            <p className="font-space text-xl text-purple-400">{status}</p>
           </div>
         </motion.div>
       </div>
@@ -975,7 +988,7 @@ export function ShareSlide({ data }: SlideProps) {
                  ${data.totalVolume.toLocaleString()}
                </p>
                <div className="md:text-right">
-                 <p className="text-2xl font-bold text-white/80">{data.transactionCount.toLocaleString()}</p>
+                 <p className="text-2xl font-bold text-white/80">{formatTransactionCount(data.transactionCount)}</p>
                  <p className="text-xs font-space uppercase tracking-wider text-zinc-500">Transactions</p>
                </div>
              </div>
@@ -997,20 +1010,31 @@ export function ShareSlide({ data }: SlideProps) {
             </div>
 
             {/* Global Rank */}
-            <div className="bg-zinc-900/60 border border-amber-500/20 rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 blur-2xl rounded-full" />
-               <div className="relative z-10">
-                 <div className="flex items-center gap-2 text-amber-500/80 mb-2">
-                   <Trophy className="w-4 h-4" />
-                   <span className="text-xs font-space uppercase tracking-wider">Rank</span>
+            {/* Global Rank - SWISS MINIMALIST UI */}
+            <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+               {/* Technical Grid Background */}
+               <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:16px_16px]" />
+               
+               <div className="relative z-10 flex flex-col h-full justify-between">
+                 <div className="flex items-center justify-between">
+                   <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Global Rank</span>
+                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                  </div>
-                 <p className="text-2xl md:text-3xl font-bold text-white mb-1">Top {percentile}%</p>
-                 <p className="text-xs text-amber-500/60 font-space uppercase">{label}</p>
-               </div>
-            </div>
+                 
+                  <div>
+                     <p className="text-xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 tracking-tighter leading-[0.8] origin-left scale-y-[1.2]">
+                       {percentile}%
+                     </p>
+                     <div className="mt-3 flex items-center gap-2">
+                        <div className="h-px w-8 bg-zinc-700" />
+                        <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest">{label}</p>
+                     </div>
+                  </div>
+                </div>
+             </div>
 
-            {/* Net Flow */}
-            <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
+             {/* Net Flow */}
+             <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5">
                <div className="flex items-center gap-2 text-zinc-400 mb-4">
                  <ArrowRightLeft className="w-4 h-4" />
                  <span className="text-xs font-space uppercase tracking-wider">Net Flow</span>
@@ -1083,48 +1107,188 @@ export function ShareSlide({ data }: SlideProps) {
 
 export function WalletRankSlide({ data }: SlideProps) {
   const { percentile, label } = data.walletRank || { percentile: 50, label: "Solana Plankton" };
+  
+  const slideRef = useRef<HTMLDivElement>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const isMobile = window.innerWidth < 768;
+      const blob = await toBlob(slideRef.current, {
+        cacheBust: true,
+        pixelRatio: 3,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+        width: isMobile ? slideRef.current.clientWidth : undefined,
+        style: isMobile ? { 
+          height: 'auto',
+          minHeight: '850px',
+          width: '100%',
+          overflow: 'visible',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: '3rem',
+          paddingBottom: '3rem'
+        } : undefined,
+      });
+
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `global-rank-${data.address.slice(0, 4)}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!slideRef.current) return;
+
+    setIsSharing(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const isMobile = window.innerWidth < 768;
+      const blob = await toBlob(slideRef.current, {
+        cacheBust: true,
+        pixelRatio: 3,
+        backgroundColor: "#09090b",
+        filter: (node) => !node.classList?.contains("no-capture"),
+        width: isMobile ? slideRef.current.clientWidth : undefined,
+        style: isMobile ? { 
+          height: 'auto',
+          minHeight: '850px',
+          width: '100%',
+          overflow: 'visible',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: '3rem',
+          paddingBottom: '3rem'
+        } : undefined,
+      });
+
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const file = new File([blob], "rank.png", { type: "image/png" });
+      
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: "My Global Rank",
+          text: `I'm in the Top ${percentile}% of Solana holders! #BlockWrap`,
+          files: [file],
+        });
+      } else {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]); 
+        alert("Image copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   return (
-    <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-amber-500/10 blur-[150px] rounded-full mix-blend-screen pointer-events-none" />
+    <div ref={slideRef} className="h-full w-full flex flex-col bg-zinc-950 relative overflow-hidden font-syne">
+      {/* Swiss Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px]" />
       
-      <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <Trophy className="h-12 w-12 text-amber-400 mx-auto mb-6" />
-          <h2 className="font-space text-sm uppercase tracking-widest text-amber-400 mb-2">Global Ranking</h2>
-          <div className="h-px w-24 bg-amber-500/30 mx-auto" />
-        </motion.div>
+      {/* Decorative Technical Lines */}
+      <div className="absolute top-8 left-8 w-64 h-px bg-zinc-800" />
+      <div className="absolute top-8 left-8 w-px h-64 bg-zinc-800" />
+      <div className="absolute bottom-8 right-8 w-64 h-px bg-zinc-800" />
+      <div className="absolute bottom-8 right-8 w-px h-64 bg-zinc-800" />
 
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-8 pb-32">
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+           initial={{ opacity: 0, y: 40 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+           className="w-full max-w-4xl"
         >
-          <p className="text-2xl text-zinc-400 mb-4 font-space">You are in the</p>
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-white mb-6">
-            Top {percentile}%
-          </h1>
-          <p className="text-xl text-zinc-500 font-space uppercase tracking-widest">
-            of Solana Holders
-          </p>
-        </motion.div>
+            <div className="flex flex-col md:flex-row items-baseline gap-4 md:gap-8 mb-8 border-b border-zinc-800 pb-8">
+                <h1 className="text-[2.5rem] md:text-[4.5rem] leading-[0.8] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 origin-bottom scale-y-[1.35]">
+                    {percentile}%
+                </h1>
+                <div className="flex flex-col">
+                    <span className="text-lg md:text-xl font-bold text-zinc-300">TOP</span>
+                    <span className="text-xs md:text-sm text-zinc-500 font-mono uppercase tracking-widest">Global Percentile</span>
+                </div>
+            </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-16 inline-block"
-        >
-          <div className="px-8 py-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-sm">
-            <p className="font-space text-sm text-amber-500/70 uppercase tracking-wider mb-2">Rank Title</p>
-            <p className="text-3xl font-bold text-amber-400">{label}</p>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12">
+                <div>
+                   <p className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-4">Rank Designation</p>
+                   <p className="text-4xl md:text-5xl font-bold text-white tracking-tight">{label}</p>
+                </div>
+                <div className="flex flex-col justify-end">
+                    <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${100 - percentile}%` }}
+                          transition={{ duration: 1.5, delay: 0.5, ease: "circOut" }}
+                          className="h-full bg-white" 
+                        />
+                    </div>
+                    <div className="flex justify-between mt-2 font-mono text-[10px] text-zinc-600 uppercase">
+                        <span>Bottom 0%</span>
+                        <span>Top 100%</span>
+                    </div>
+                </div>
+            </div>
         </motion.div>
       </div>
+
+      {/* Action Bar */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="absolute bottom-12 left-0 right-0 z-50 flex justify-center gap-4 no-capture"
+        data-html2canvas-ignore
+      >
+        <button
+          onClick={handleShare}
+          disabled={isSharing}
+          className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-zinc-200 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50 shadow-lg shadow-white/10"
+        >
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+          <span className="hidden md:inline">Share</span>
+        </button>
+
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-full text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all font-space text-sm uppercase tracking-wide disabled:opacity-50"
+        >
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          <span className="hidden md:inline">Save</span>
+        </button>
+      </motion.div>
+
+       {/* Watermark - Only visible during capture */}
+       {(isSharing || isDownloading) && (
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+          blockwrap.xyz
+        </div>
+      )}
     </div>
   );
 }

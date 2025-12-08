@@ -74,9 +74,20 @@ export function ActivityChart({ data, title = "Monthly Activity" }: ActivityChar
                 tickFormatter={(value) => `${value}`}
                 />
                 <Tooltip 
-                cursor={{ fill: 'transparent' }}
-                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff' }}
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-zinc-900/90 backdrop-blur-sm border border-white/10 rounded-lg p-3 shadow-xl">
+                          <p className="font-space text-xs text-zinc-400 mb-1">{label}</p>
+                          <p className="font-space text-sm font-bold text-white">
+                            {payload[0].value} <span className="text-purple-400 text-xs font-normal">TXS</span>
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
                 <Bar
                 dataKey="total"
@@ -105,9 +116,20 @@ export function ActivityChart({ data, title = "Monthly Activity" }: ActivityChar
                 allowDecimals={false}
                 />
                 <Tooltip 
-                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff' }}
-                cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }}
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-zinc-900/90 backdrop-blur-sm border border-white/10 rounded-lg p-3 shadow-xl">
+                          <p className="font-space text-xs text-zinc-400 mb-1">{label}</p>
+                          <p className="font-space text-sm font-bold text-white">
+                            {payload[0].value} <span className="text-purple-400 text-xs font-normal">TXS</span>
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                  cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }}
                 />
                 <Line
                 type="monotone"

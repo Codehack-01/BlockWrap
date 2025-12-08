@@ -45,7 +45,7 @@ export interface WalletData {
     activity: number[] | { name: string; total: number }[]; // Monthly (number[]) or Daily (object[])
     monthChange?: number; // Transactions in the last 30 days
     volumeChangePercentage?: number; // % change in volume vs previous 30 days
-    personality: "The HODLer" | "The Degen" | "The Trader" | "The NFT Collector";
+    personality: "The HODLer" | "The Degen" | "The Trader" | "The NFT Collector" | "The Bot?" | "The Diamond Hands" | "The Night Owl" | "The Weekender" | "The Solana Maxi";
     walletRank?: WalletRank; // Added
     transactions: Transaction[];
     allTransactions?: Transaction[]; // For filtering
