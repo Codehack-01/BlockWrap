@@ -1195,14 +1195,14 @@ export function WalletRankSlide({ data }: SlideProps) {
         width: isMobile ? slideRef.current.clientWidth : undefined,
         style: isMobile ? { 
           height: 'auto',
-          minHeight: '850px',
+          minHeight: '650px',
           width: '100%',
           position: 'relative',
           overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
-          paddingTop: '3rem',
-          paddingBottom: '3rem'
+          alignItems: 'center',
+          justifyContent: 'center'
         } : undefined,
       });
 
@@ -1245,14 +1245,14 @@ export function WalletRankSlide({ data }: SlideProps) {
         height: isMobile ? undefined : undefined,
         style: isMobile ? { 
           height: 'auto',
-          minHeight: '850px',
+          minHeight: '650px',
           width: '100%',
           position: 'relative',
           overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
-          paddingTop: '3rem',
-          paddingBottom: '3rem'
+          alignItems: 'center',
+          justifyContent: 'center'
         } : undefined,
       });
 
