@@ -6,6 +6,7 @@ import { WalletData } from "@/lib/mock-data";
 import { formatTransactionCount } from "@/lib/utils";
 import { TrendingUp, Coins, Trophy, Users, Sparkles, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Calendar, Rocket, Share2, Download, Loader2 } from "lucide-react";
 import { toBlob, toPng } from "html-to-image";
+import { useStoryContext } from "./story-container";
 
 interface SlideProps {
   data: WalletData;
@@ -146,11 +147,13 @@ export function TopAssetSlide({ data }: SlideProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const { pauseStory, resumeStory } = useStoryContext();
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsDownloading(true);
     setIsCapturing(true);
     
@@ -173,6 +176,7 @@ export function TopAssetSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsDownloading(false);
+      resumeStory();
     }
   };
 
@@ -180,6 +184,7 @@ export function TopAssetSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsSharing(true);
     setIsCapturing(true);
     
@@ -213,6 +218,7 @@ export function TopAssetSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsSharing(false);
+      resumeStory();
     }
   };
 
@@ -500,11 +506,13 @@ export function InflowOutflowSlide({ data }: SlideProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const { pauseStory, resumeStory } = useStoryContext();
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation(); 
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsDownloading(true);
     setIsCapturing(true);
     
@@ -527,6 +535,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsDownloading(false);
+      resumeStory();
     }
   };
 
@@ -534,6 +543,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsSharing(true);
     setIsCapturing(true);
     
@@ -567,6 +577,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsSharing(false);
+      resumeStory();
     }
   };
 
@@ -731,6 +742,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const { pauseStory, resumeStory } = useStoryContext();
 
   const { amount, currency, usdValue, to, date } = data.biggestTransaction || { 
     amount: 1250, 
@@ -751,6 +763,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsDownloading(true);
     setIsCapturing(true);
     
@@ -775,6 +788,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsDownloading(false);
+      resumeStory();
     }
   };
 
@@ -782,6 +796,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsSharing(true);
     setIsCapturing(true);
     
@@ -815,6 +830,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsSharing(false);
+      resumeStory();
     }
   };
 
@@ -912,6 +928,7 @@ export function ShareSlide({ data }: SlideProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const { pauseStory, resumeStory } = useStoryContext();
   
   const { percentile, label } = data.walletRank || { percentile: 50, label: "Solana Plankton" };
   const totalVolumeUsd = data.totalVolume * (data.solPrice || 0);
@@ -920,6 +937,7 @@ export function ShareSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsDownloading(true);
     setIsCapturing(true);
     
@@ -957,6 +975,7 @@ export function ShareSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsDownloading(false);
+      resumeStory();
     }
   };
 
@@ -964,6 +983,7 @@ export function ShareSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsSharing(true);
     setIsCapturing(true);
     
@@ -1013,6 +1033,7 @@ export function ShareSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsSharing(false);
+      resumeStory();
     }
   };
 
@@ -1174,11 +1195,13 @@ export function WalletRankSlide({ data }: SlideProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const { pauseStory, resumeStory } = useStoryContext();
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsDownloading(true);
     setIsCapturing(true);
     
@@ -1221,6 +1244,7 @@ export function WalletRankSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsDownloading(false);
+      resumeStory();
     }
   };
 
@@ -1228,6 +1252,7 @@ export function WalletRankSlide({ data }: SlideProps) {
     e.stopPropagation();
     if (!slideRef.current) return;
 
+    pauseStory();
     setIsSharing(true);
     setIsCapturing(true);
     
@@ -1276,6 +1301,7 @@ export function WalletRankSlide({ data }: SlideProps) {
     } finally {
       setIsCapturing(false);
       setIsSharing(false);
+      resumeStory();
     }
   };
 
