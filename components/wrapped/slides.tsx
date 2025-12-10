@@ -296,7 +296,7 @@ export function TopAssetsSlide({ data }: SlideProps) {
   
   return (
     <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-yellow-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] blur-[60px] md:w-[600px] md:h-[600px] md:blur-[120px] bg-yellow-600/10 rounded-full mix-blend-screen pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-4xl mx-auto">
         <motion.div
@@ -318,7 +318,7 @@ export function TopAssetsSlide({ data }: SlideProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
-              className="group flex items-baseline justify-between py-4 border-b border-zinc-800 hover:border-yellow-500/50 transition-colors duration-500"
+              className="group flex items-baseline justify-between py-4 border-b border-zinc-800 hover:border-yellow-500/50 transition-colors duration-500 will-change-transform"
             >
               <div className="flex items-baseline gap-6">
                 <span className="font-space text-sm text-zinc-600">0{index + 1}</span>
@@ -376,7 +376,7 @@ export function TopWalletsSlide({ data }: SlideProps) {
 
   return (
     <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[300px] h-[300px] blur-[60px] md:w-[600px] md:h-[600px] md:blur-[120px] bg-cyan-600/10 rounded-full mix-blend-screen pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-4xl mx-auto">
         <motion.div
@@ -399,7 +399,7 @@ export function TopWalletsSlide({ data }: SlideProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
               onClick={(e) => handleCopy(wallet.address, e)}
-              className="group flex items-center justify-between py-3 border-b border-zinc-800 hover:border-cyan-500/50 transition-colors duration-500 cursor-pointer"
+              className="group flex items-center justify-between py-3 border-b border-zinc-800 hover:border-cyan-500/50 transition-colors duration-500 cursor-pointer will-change-transform"
             >
               <div className="flex items-center gap-6 min-w-0 flex-1">
                 <span className="font-space text-sm text-zinc-600">0{index + 1}</span>
