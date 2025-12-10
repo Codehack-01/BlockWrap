@@ -54,48 +54,65 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         throw new Error("HELIUS_API_KEY is not defined");
     }
 
-    // 1. Fetch Assets (Balances)
-    const assetsResponse = await fetch(RPC_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: "get-assets",
-            method: "getAssetsByOwner",
-            params: {
-                ownerAddress: address,
-                page: 1,
-                limit: 100,
-                displayOptions: {
-                    showFungible: true,
-                    showNativeBalance: true,
-                },
-            },
-        }),
-    });
+    const assets: HeliusAsset[] = [];
+    let page = 1;
 
+    let nativeBalance: { lamports: number; price_per_sol: number; total_price: number } | null = null;
+    let solPrice = 0;
 
+    while (true) {
+        try {
+            const assetsResponse = await fetch(RPC_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    jsonrpc: "2.0",
+                    id: "get-assets",
+                    method: "getAssetsByOwner",
+                    params: {
+                        ownerAddress: address,
+                        page: page,
+                        limit: 1000,
+                        displayOptions: {
+                            showFungible: true,
+                            showNativeBalance: true,
+                        },
+                    },
+                }),
+            });
 
-    const assetsJson = await assetsResponse.json();
+            const assetsJson = await assetsResponse.json();
 
-    if (assetsJson.error) {
-        console.error("Helius API Error:", assetsJson.error);
-        throw new Error(assetsJson.error.message);
+            if (assetsJson.error) {
+                console.error("Helius API Error (Page " + page + "):", assetsJson.error);
+                break;
+            }
+
+            if (!nativeBalance && assetsJson.result?.nativeBalance) {
+                nativeBalance = assetsJson.result.nativeBalance;
+            }
+
+            const items = assetsJson.result?.items || [];
+            if (items.length === 0) break;
+
+            assets.push(...items);
+
+            if (items.length < 1000) break;
+            page++;
+        } catch (e) {
+            console.error("Pagination error:", e);
+            break;
+        }
     }
-
-    const assets: HeliusAsset[] = assetsJson.result?.items || [];
-
 
     // Find top asset by value
     let topAsset = { symbol: "SOL", amount: 0, valueUsd: 0 };
 
-    // Handle Native SOL Balance
-    if (assetsJson.result?.nativeBalance) {
-        const nativeBalance = assetsJson.result.nativeBalance;
+    if (nativeBalance) {
         const solAmount = nativeBalance.lamports / 1e9;
         const solValue = nativeBalance.total_price || 0;
+        solPrice = nativeBalance.price_per_sol || 0;
 
-        // Set SOL as initial top asset
         topAsset = {
             symbol: "SOL",
             amount: solAmount,
@@ -105,39 +122,31 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
     const allAssets: { symbol: string; amount: number; valueUsd: number }[] = [];
 
-    // Add SOL if it exists
     if (topAsset.amount > 0) {
         allAssets.push(topAsset);
     }
 
     assets.forEach((asset) => {
-        // Skip if no token info (e.g. some NFTs or compressed assets)
         if (!asset.token_info) return;
 
-        // Calculate amount (balance / 10^decimals)
         const decimals = asset.token_info.decimals || 0;
         const amount = asset.token_info.balance / Math.pow(10, decimals);
         const value = asset.token_info.price_info?.total_price || 0;
         const symbol = asset.content.metadata.symbol || "Unknown";
 
-        // Add to list
         if (amount > 0) {
             allAssets.push({ symbol, amount, valueUsd: value });
         }
     });
 
-    // Sort by USD Value descending
     allAssets.sort((a, b) => b.valueUsd - a.valueUsd);
 
-    // Update topAsset to be the actual top one (if any exist)
     if (allAssets.length > 0) {
         topAsset = allAssets[0];
     }
 
-    // Get Top 5
     const topAssets = allAssets.slice(0, 5);
 
-    // Create a map of Mint -> Symbol and Mint -> Price for quick lookup
     const mintToSymbol = new Map<string, string>();
     const mintToPrice = new Map<string, number>();
 
@@ -321,6 +330,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
         // Calculate Volume (simplified: sum of all native transfers involving the user)
         let txAmount = 0;
+        let isNative = false;
         let type: "in" | "out" = "out";
 
         // Check native transfers
@@ -328,6 +338,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         tx.nativeTransfers?.forEach(transfer => {
             const amount = transfer.amount / 1e9; // Lamports to SOL
             if (transfer.fromUserAccount === address || transfer.toUserAccount === address) {
+                isNative = true;
                 if (transfer.fromUserAccount === address) {
                     txAmount += amount; // Accumulate
                     type = "out";
@@ -397,7 +408,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
             // Calculate USD value
             let txUsdValue = 0;
             if (formattedTx.currency === "SOL") {
-                txUsdValue = formattedTx.amount * (assetsJson.result?.nativeBalance?.price_per_sol || 0);
+                txUsdValue = formattedTx.amount * (nativeBalance?.price_per_sol || 0);
             } else {
                 // Try to find mint for this currency (this is tricky since we only have symbol in formattedTx)
                 // We need to look at the raw tx again or store mint in formattedTx
@@ -422,8 +433,8 @@ export async function getHeliusData(address: string): Promise<WalletData> {
             }
         }
 
-        // Track interactions
-        if (counterparty && counterparty !== address) {
+        // Track interactions (Only Native SOL)
+        if (counterparty && counterparty !== address && isNative) {
             // Map "in"/"out" to "received"/"sent"
             const interactionType = type === "in" ? "received" : "sent";
 
@@ -481,7 +492,6 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     // Metrics for personality
     const txCount = transactionCount; // Total signatures
     // We need to ensure solPrice is available. It comes from assetsJson.
-    const solPrice = assetsJson.result?.nativeBalance?.price_per_sol || 0;
     const solVolUsd = totalVolume * solPrice; // Approx USD volume of SOL moves
 
     // 1. Time based & Type based
@@ -552,7 +562,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
         return { percentile: 50, label: "Solana Plankton" };
     };
 
-    const solBalance = assetsJson.result?.nativeBalance?.lamports ? assetsJson.result.nativeBalance.lamports / 1e9 : 0;
+    const solBalance = nativeBalance ? nativeBalance.lamports / 1e9 : 0;
     const walletRank = calculateRank(solBalance);
 
     return {

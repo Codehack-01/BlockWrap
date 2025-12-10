@@ -92,7 +92,7 @@ export function VolumeSlide({ data }: SlideProps) {
           className="flex items-center gap-4 mb-8"
         >
           <TrendingUp className="h-6 w-6 text-purple-400" />
-          <h2 className="font-space text-sm uppercase tracking-widest text-purple-400">Total Volume</h2>
+          <h2 className="font-space text-sm uppercase tracking-widest text-purple-400">Transactions Volume</h2>
         </motion.div>
         
         <motion.div
@@ -100,9 +100,25 @@ export function VolumeSlide({ data }: SlideProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="text-[7vw] leading-none font-bold tracking-tighter text-white block">
-            ${data.totalVolume.toLocaleString()}
-          </span>
+          <p className="text-xs md:text-sm text-zinc-500 font-mono uppercase tracking-widest mb-4">
+            You had a total transaction volume of
+          </p>
+          <div className="flex flex-col md:flex-row items-center md:items-baseline justify-center gap-2 md:gap-4">
+            <span className={`${
+              data.totalVolume.toLocaleString().length <= 4 ? "text-[5rem] md:text-[7rem]" : // 999
+              data.totalVolume.toLocaleString().length <= 6 ? "text-[4.5rem] md:text-[6rem]" : // 10,000
+              data.totalVolume.toLocaleString().length <= 8 ? "text-[4rem] md:text-[5rem]" : // 100,000
+              data.totalVolume.toLocaleString().length <= 10 ? "text-[3.5rem] md:text-[4rem]" : // 10,000,000
+              data.totalVolume.toLocaleString().length <= 13 ? "text-[3rem] md:text-[3rem]" : // 100,000,000
+              "text-[2rem] md:text-[2.5rem]" // Billions+
+            } leading-none font-bold tracking-tighter text-white block whitespace-nowrap`}>
+              {data.totalVolume.toLocaleString()}
+            </span>
+            <span className="text-2xl md:text-4xl font-bold tracking-tight text-white">SOL</span>
+          </div>
+          <p className="text-center font-space text-sm md:text-xl text-zinc-500 mt-2 md:mt-4">
+            ≈ ${(data.totalVolume * (data.solPrice || 0)).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          </p>
         </motion.div>
 
         <motion.div
@@ -207,7 +223,7 @@ export function TopAssetSlide({ data }: SlideProps) {
             <p className="font-space text-sm uppercase tracking-widest text-emerald-400">Top Asset</p>
           </div>
           
-          <h1 className="text-[6rem] leading-[0.8] font-bold tracking-tighter text-white mb-8">
+          <h1 className="text-[5rem] md:text-[6rem] leading-[0.8] font-bold tracking-tighter text-white mb-8">
             {data.topAsset.symbol}
           </h1>
           
@@ -267,7 +283,7 @@ export function TopAssetSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture */}
       {(isSharing || isDownloading) && (
-        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none">
           blockwrap.xyz
         </div>
       )}
@@ -411,7 +427,7 @@ export function TopWalletsSlide({ data }: SlideProps) {
                   {wallet.interactionCount} <span className="text-sm text-zinc-600">TXS</span>
                 </p>
                 <p className="font-space text-xs text-zinc-600 uppercase tracking-wider">
-                  {wallet.totalVolume.toFixed(2)} SOL Vol
+                  {wallet.totalVolume.toFixed(2)} SOL
                 </p>
               </div>
             </motion.div>
@@ -565,16 +581,25 @@ export function InflowOutflowSlide({ data }: SlideProps) {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-right pr-8 md:pr-0"
+            className="text-right pr-2 md:pr-0"
           >
             <div className="flex items-center justify-end gap-3 mb-4">
               <span className="font-space text-sm uppercase tracking-widest text-green-500">Inflow</span>
               <ArrowDownLeft className="h-5 w-5 text-green-500" />
             </div>
-            <p className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-2">
+            <p className={`${
+              (data.totalInflow?.toLocaleString() ?? "0").length <= 4 ? "text-[2.5rem] md:text-[3rem]" :
+              (data.totalInflow?.toLocaleString() ?? "0").length <= 6 ? "text-[2rem] md:text-[3rem]" :
+              (data.totalInflow?.toLocaleString() ?? "0").length <= 8 ? "text-[1.8rem] md:text-[2.2rem]" :
+              (data.totalInflow?.toLocaleString() ?? "0").length <= 10 ? "text-[1.5rem] md:text-[2rem]" :
+              (data.totalInflow?.toLocaleString() ?? "0").length <= 13 ? "text-[1.2rem] md:text-[1.7rem]" :
+              "text-[1rem] md:text-[3rem]"
+            } font-bold text-white tracking-tighter mb-2 whitespace-nowrap leading-[0.9]`}>
               +{data.totalInflow?.toLocaleString() ?? 0}
             </p>
-            <p className="font-space text-xl text-zinc-500">
+            <p className={`font-space text-zinc-500 ${
+              (data.totalInflowUsd?.toLocaleString() ?? "0.00").length > 10 ? "text-xs md:text-xl" : "text-xl"
+            }`}>
               ${data.totalInflowUsd?.toLocaleString() ?? "0.00"}
             </p>
           </motion.div>
@@ -583,16 +608,25 @@ export function InflowOutflowSlide({ data }: SlideProps) {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-left pl-8 md:pl-0"
+            className="text-left pl-2 md:pl-0"
           >
             <div className="flex items-center gap-3 mb-4">
               <ArrowUpRight className="h-5 w-5 text-red-500" />
               <span className="font-space text-sm uppercase tracking-widest text-red-500">Outflow</span>
             </div>
-            <p className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-2">
+            <p className={`${
+              (data.totalOutflow?.toLocaleString() ?? "0").length <= 4 ? "text-[2.5rem] md:text-[3rem]" :
+              (data.totalOutflow?.toLocaleString() ?? "0").length <= 6 ? "text-[2rem] md:text-[3rem]" :
+              (data.totalOutflow?.toLocaleString() ?? "0").length <= 8 ? "text-[1.8rem] md:text-[2.2rem]" :
+              (data.totalOutflow?.toLocaleString() ?? "0").length <= 10 ? "text-[1.5rem] md:text-[2rem]" :
+              (data.totalOutflow?.toLocaleString() ?? "0").length <= 13 ? "text-[1.2rem] md:text-[1.7rem]" :
+              "text-[1rem] md:text-[3rem]"
+            } font-bold text-white tracking-tighter mb-2 whitespace-nowrap leading-[0.9]`}>
               -{data.totalOutflow?.toLocaleString() ?? 0}
             </p>
-            <p className="font-space text-xl text-zinc-500">
+            <p className={`font-space text-zinc-500 ${
+              (data.totalOutflowUsd?.toLocaleString() ?? "0.00").length > 10 ? "text-xs md:text-xl" : "text-xl"
+            }`}>
               ${data.totalOutflowUsd?.toLocaleString() ?? "0.00"}
             </p>
           </motion.div>
@@ -628,7 +662,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture */}
       {(isSharing || isDownloading) && (
-        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none">
           blockwrap.xyz
         </div>
       )}
@@ -846,7 +880,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture */}
       {(isSharing || isDownloading) && (
-        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none">
           blockwrap.xyz
         </div>
       )}
@@ -860,6 +894,7 @@ export function ShareSlide({ data }: SlideProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   
   const { percentile, label } = data.walletRank || { percentile: 50, label: "Solana Plankton" };
+  const totalVolumeUsd = data.totalVolume * (data.solPrice || 0);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -983,8 +1018,8 @@ export function ShareSlide({ data }: SlideProps) {
                <span className="text-xs font-space uppercase tracking-wider">Total Volume</span>
              </div>
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-               <p className="text-4xl md:text-5xl font-bold tracking-tighter text-white">
-                 ${data.totalVolume.toLocaleString()}
+               <p className={`${totalVolumeUsd.toLocaleString().length > 12 ? "text-4xl md:text-2xl" : totalVolumeUsd.toLocaleString().length > 8 ? "text-3xl md:text-3xl" : "text-4xl md:text-4xl"} font-bold tracking-tighter text-white whitespace-nowrap`}>
+                 ${totalVolumeUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                </p>
                <div className="md:text-right">
                  <p className="text-2xl font-bold text-white/80">{formatTransactionCount(data.transactionCount)}</p>
@@ -1021,7 +1056,7 @@ export function ShareSlide({ data }: SlideProps) {
                  </div>
                  
                   <div>
-                     <p className="text-xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 tracking-tighter leading-[0.8] origin-left scale-y-[1.2]">
+                     <p className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 tracking-tighter origin-left scale-y-[1.5]">
                        {percentile}%
                      </p>
                      <div className="mt-3 flex items-center gap-2">
@@ -1096,7 +1131,7 @@ export function ShareSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture */}
       {(isSharing || isDownloading) && (
-        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none">
           blockwrap.xyz
         </div>
       )}
@@ -1210,8 +1245,8 @@ export function WalletRankSlide({ data }: SlideProps) {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px]" />
       
       {/* Decorative Technical Lines */}
-      <div className="absolute top-8 left-8 w-64 h-px bg-zinc-800" />
-      <div className="absolute top-8 left-8 w-px h-64 bg-zinc-800" />
+      {/* <div className="absolute top-8 left-8 w-64 h-px bg-zinc-800" />
+      <div className="absolute top-8 left-8 w-px h-64 bg-zinc-800" /> */}
       <div className="absolute bottom-8 right-8 w-64 h-px bg-zinc-800" />
       <div className="absolute bottom-8 right-8 w-px h-64 bg-zinc-800" />
 
@@ -1222,15 +1257,25 @@ export function WalletRankSlide({ data }: SlideProps) {
            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
            className="w-full max-w-4xl"
         >
-            <div className="flex flex-col md:flex-row items-baseline gap-4 md:gap-8 mb-8 border-b border-zinc-800 pb-8">
-                <h1 className="text-[2.5rem] md:text-[4.5rem] leading-[0.8] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 origin-bottom scale-y-[1.35]">
+            <div className="border-b border-zinc-800 pb-8 mb-8">
+              <div className="flex flex-col md:flex-row items-baseline gap-4 md:gap-8">
+                <h1 className="text-[4rem] md:text-[4rem] leading- font-black  text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 origin-bottom scale-y-[1.35]">
                     {percentile}%
                 </h1>
+    
                 <div className="flex flex-col">
                     <span className="text-lg md:text-xl font-bold text-zinc-300">TOP</span>
                     <span className="text-xs md:text-sm text-zinc-500 font-mono uppercase tracking-widest">Global Percentile</span>
                 </div>
+              </div>
+
+              <div className="mt-6 block">
+                  <p className="text-xs md:text-sm text-zinc-500 font-mono uppercase tracking-widest">You ranked top {percentile}% in the solana holders global percentage</p>
+              </div>
             </div>
+
+            
+            
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12">
                 <div>
@@ -1247,8 +1292,8 @@ export function WalletRankSlide({ data }: SlideProps) {
                         />
                     </div>
                     <div className="flex justify-between mt-2 font-mono text-[10px] text-zinc-600 uppercase">
-                        <span>Bottom 0%</span>
-                        <span>Top 100%</span>
+                        <span></span>
+                        <span>Top {percentile}%</span>
                     </div>
                 </div>
             </div>
@@ -1284,7 +1329,7 @@ export function WalletRankSlide({ data }: SlideProps) {
 
        {/* Watermark - Only visible during capture */}
        {(isSharing || isDownloading) && (
-        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none">
+        <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none">
           blockwrap.xyz
         </div>
       )}

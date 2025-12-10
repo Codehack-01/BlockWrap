@@ -229,7 +229,7 @@ function DashboardContent() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${filteredData.totalVolume.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{filteredData.totalVolume.toLocaleString()} SOL</div>
             <p className="text-xs text-muted-foreground">
               {filteredData.volumeChangePercentage !== undefined 
                 ? `${filteredData.volumeChangePercentage >= 0 ? "+" : ""}${filteredData.volumeChangePercentage}% from last month`
@@ -284,7 +284,7 @@ function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredData.topAsset.symbol}</div>
-            <p className="text-xs text-muted-foreground">{filteredData.topAsset.amount} tokens</p>
+            <p className="text-xs text-muted-foreground">{filteredData.topAsset.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tokens</p>
           </CardContent>
         </Card>
         <Card>
