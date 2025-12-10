@@ -158,7 +158,10 @@ export function TopAssetSlide({ data }: SlideProps) {
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -185,7 +188,10 @@ export function TopAssetSlide({ data }: SlideProps) {
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -508,7 +514,10 @@ export function InflowOutflowSlide({ data }: SlideProps) {
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -535,7 +544,10 @@ export function InflowOutflowSlide({ data }: SlideProps) {
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -751,7 +763,10 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -780,7 +795,10 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -922,6 +940,7 @@ export function ShareSlide({ data }: SlideProps) {
           height: 'auto',
           minHeight: '850px', // Force it to be tall/big
           width: '100%',
+          position: 'relative',
           overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
@@ -931,7 +950,10 @@ export function ShareSlide({ data }: SlideProps) {
         } : undefined,
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -965,6 +987,7 @@ export function ShareSlide({ data }: SlideProps) {
           height: 'auto',
           minHeight: '850px',
           width: '100%',
+          position: 'relative',
           overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
@@ -973,7 +996,10 @@ export function ShareSlide({ data }: SlideProps) {
         } : undefined,
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -1175,6 +1201,7 @@ export function WalletRankSlide({ data }: SlideProps) {
           height: 'auto',
           minHeight: '850px',
           width: '100%',
+          position: 'relative',
           overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
@@ -1183,7 +1210,10 @@ export function WalletRankSlide({ data }: SlideProps) {
         } : undefined,
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -1222,6 +1252,7 @@ export function WalletRankSlide({ data }: SlideProps) {
           height: 'auto',
           minHeight: '850px',
           width: '100%',
+          position: 'relative',
           overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
@@ -1230,7 +1261,10 @@ export function WalletRankSlide({ data }: SlideProps) {
         } : undefined,
         onClone: (clonedNode: HTMLElement) => {
             const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) watermark.style.opacity = "1";
+            if (watermark) {
+                watermark.style.opacity = "1";
+                watermark.style.visibility = "visible";
+            }
         }
       } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
