@@ -442,7 +442,7 @@ export function TopWalletsSlide({ data }: SlideProps) {
 export function PersonalitySlide({ data }: SlideProps) {
   return (
     <div className="h-full w-full flex flex-col justify-center p-8 relative overflow-hidden bg-zinc-950">
-      <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-pink-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full md:w-[800px] h-[50vh] md:h-[800px] bg-pink-600/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
       
       <div className="relative z-10 max-w-4xl mx-auto w-full">
         <motion.p 
@@ -460,7 +460,7 @@ export function PersonalitySlide({ data }: SlideProps) {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
         >
-          <h1 className="text-6xl md:text-8xl font-bold text-white leading-[0.9] tracking-tighter mix-blend-overlay opacity-50 absolute top-2 left-2 select-none">
+          <h1 className="text-6xl md:text-8xl font-bold text-white leading-[0.9] tracking-tighter mix-blend-overlay opacity-50 absolute top-2 left-2 select-none w-full">
             {data.personality}
           </h1>
           <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-pink-200 leading-[0.9] tracking-tighter relative z-10">
