@@ -145,25 +145,24 @@ export function TopAssetSlide({ data }: SlideProps) {
   const slideRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!slideRef.current) return;
 
     setIsDownloading(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const dataUrl = await toPng(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       const link = document.createElement("a");
       link.download = `blockwrap-top-asset-${Date.now()}.png`;
@@ -172,6 +171,7 @@ export function TopAssetSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Capture failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsDownloading(false);
     }
   };
@@ -181,19 +181,17 @@ export function TopAssetSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsSharing(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -213,6 +211,7 @@ export function TopAssetSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Share failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsSharing(false);
     }
   };
@@ -291,9 +290,8 @@ export function TopAssetSlide({ data }: SlideProps) {
         </button>
       </motion.div>
 
-      {/* Watermark - Only visible during capture */}
-      {/* Watermark - Hidden by default, visible in capture via onClone */}
-      <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none opacity-0 watermark">
+      {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
+      <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
         blockwrap.xyz
       </div>
     </div>
@@ -501,25 +499,24 @@ export function InflowOutflowSlide({ data }: SlideProps) {
   const slideRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation(); 
     if (!slideRef.current) return;
 
     setIsDownloading(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const dataUrl = await toPng(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       const link = document.createElement("a");
       link.download = `blockwrap-money-moves-${Date.now()}.png`;
@@ -528,6 +525,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Capture failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsDownloading(false);
     }
   };
@@ -537,19 +535,17 @@ export function InflowOutflowSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsSharing(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -568,8 +564,8 @@ export function InflowOutflowSlide({ data }: SlideProps) {
       }
     } catch (err) {
       console.error("Share failed:", err);
-      // Fallback/Error UI could be added here
     } finally {
+      setIsCapturing(false);
       setIsSharing(false);
     }
   };
@@ -678,9 +674,8 @@ export function InflowOutflowSlide({ data }: SlideProps) {
         </button>
       </motion.div>
 
-      {/* Watermark - Only visible during capture */}
-      {/* Watermark - Hidden by default, visible in capture via onClone */}
-      <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none opacity-0 watermark">
+      {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
+      <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
         blockwrap.xyz
       </div>
     </div>
@@ -735,6 +730,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const { amount, currency, usdValue, to, date } = data.biggestTransaction || { 
     amount: 1250, 
@@ -756,19 +752,17 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsDownloading(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -779,6 +773,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Download failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsDownloading(false);
     }
   };
@@ -788,19 +783,17 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsSharing(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const blob = await toBlob(slideRef.current, {
         cacheBust: true,
         backgroundColor: "#09090b",
         filter: (node: HTMLElement) => !node.classList?.contains("no-capture"),
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -820,6 +813,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Share failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsSharing(false);
     }
   };
@@ -905,9 +899,8 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
         </button>
       </motion.div>
 
-      {/* Watermark - Only visible during capture */}
-      {/* Watermark - Hidden by default, visible in capture via onClone */}
-      <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none opacity-0 watermark">
+      {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
+      <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
         blockwrap.xyz
       </div>
     </div>
@@ -918,6 +911,7 @@ export function ShareSlide({ data }: SlideProps) {
   const slideRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
   
   const { percentile, label } = data.walletRank || { percentile: 50, label: "Solana Plankton" };
   const totalVolumeUsd = data.totalVolume * (data.solPrice || 0);
@@ -927,6 +921,11 @@ export function ShareSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsDownloading(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const isMobile = window.innerWidth < 768;
       
@@ -938,7 +937,7 @@ export function ShareSlide({ data }: SlideProps) {
         width: isMobile ? slideRef.current.clientWidth : undefined,
         style: isMobile ? { 
           height: 'auto',
-          minHeight: '850px', // Force it to be tall/big
+          minHeight: '850px',
           width: '100%',
           position: 'relative',
           overflow: 'visible',
@@ -946,16 +945,8 @@ export function ShareSlide({ data }: SlideProps) {
           flexDirection: 'column',
           paddingTop: '3rem',
           paddingBottom: '3rem'
-          // removed justify-between so footer stays near content
         } : undefined,
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       const link = document.createElement("a");
       link.download = `blockwrap-summary-${Date.now()}.png`;
@@ -964,6 +955,7 @@ export function ShareSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Capture failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsDownloading(false);
     }
   };
@@ -973,6 +965,11 @@ export function ShareSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsSharing(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const isMobile = window.innerWidth < 768;
       
@@ -994,14 +991,7 @@ export function ShareSlide({ data }: SlideProps) {
           paddingTop: '3rem',
           paddingBottom: '3rem'
         } : undefined,
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -1021,6 +1011,7 @@ export function ShareSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Share failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsSharing(false);
     }
   };
@@ -1168,9 +1159,8 @@ export function ShareSlide({ data }: SlideProps) {
       </motion.div>
 
 
-      {/* Watermark - Only visible during capture */}
-      {/* Watermark - Hidden by default, visible in capture via onClone */}
-      <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none opacity-0 watermark">
+      {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
+      <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
         blockwrap.xyz
       </div>
     </div>
@@ -1183,12 +1173,18 @@ export function WalletRankSlide({ data }: SlideProps) {
   const slideRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!slideRef.current) return;
 
     setIsDownloading(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const isMobile = window.innerWidth < 768;
       const blob = await toBlob(slideRef.current, {
@@ -1208,14 +1204,7 @@ export function WalletRankSlide({ data }: SlideProps) {
           paddingTop: '3rem',
           paddingBottom: '3rem'
         } : undefined,
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -1230,6 +1219,7 @@ export function WalletRankSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Download failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsDownloading(false);
     }
   };
@@ -1239,6 +1229,11 @@ export function WalletRankSlide({ data }: SlideProps) {
     if (!slideRef.current) return;
 
     setIsSharing(true);
+    setIsCapturing(true);
+    
+    // Wait for React to render the watermark visible
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     try {
       const isMobile = window.innerWidth < 768;
       const blob = await toBlob(slideRef.current, {
@@ -1259,14 +1254,7 @@ export function WalletRankSlide({ data }: SlideProps) {
           paddingTop: '3rem',
           paddingBottom: '3rem'
         } : undefined,
-        onClone: (clonedNode: HTMLElement) => {
-            const watermark = clonedNode.querySelector(".watermark") as HTMLElement;
-            if (watermark) {
-                watermark.style.opacity = "1";
-                watermark.style.visibility = "visible";
-            }
-        }
-      } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      });
 
       if (!blob) throw new Error("Failed to generate image blob");
 
@@ -1286,6 +1274,7 @@ export function WalletRankSlide({ data }: SlideProps) {
     } catch (err) {
       console.error("Share failed:", err);
     } finally {
+      setIsCapturing(false);
       setIsSharing(false);
     }
   };
@@ -1380,9 +1369,8 @@ export function WalletRankSlide({ data }: SlideProps) {
         </button>
       </motion.div>
 
-       {/* Watermark - Only visible during capture */}
-       {/* Watermark - Hidden by default, visible in capture via onClone */}
-      <div className="absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none opacity-0 watermark">
+       {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
+      <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
         blockwrap.xyz
       </div>
     </div>
