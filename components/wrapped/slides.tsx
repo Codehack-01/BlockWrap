@@ -1240,7 +1240,7 @@ export function WalletRankSlide({ data }: SlideProps) {
   };
 
   return (
-    <div ref={slideRef} className="h-full w-full flex flex-col bg-zinc-950 relative overflow-hidden font-syne">
+    <div ref={slideRef} className="h-full w-full flex flex-col bg-zinc-950 relative overflow-hidden font-syne justify-center">
       {/* Swiss Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px]" />
       
@@ -1250,7 +1250,7 @@ export function WalletRankSlide({ data }: SlideProps) {
       <div className="absolute bottom-8 right-8 w-64 h-px bg-zinc-800" />
       <div className="absolute bottom-8 right-8 w-px h-64 bg-zinc-800" />
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-8 pb-32">
+      <div className="relative z-10 w-full flex flex-col items-center justify-center p-8">
         <motion.div
            initial={{ opacity: 0, y: 40 }}
            animate={{ opacity: 1, y: 0 }}
@@ -1277,12 +1277,12 @@ export function WalletRankSlide({ data }: SlideProps) {
             
             
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12">
+            <div className="mt-12 space-y-8">
                 <div>
                    <p className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-4">Rank Designation</p>
                    <p className="text-4xl md:text-5xl font-bold text-white tracking-tight">{label}</p>
                 </div>
-                <div className="flex flex-col justify-end">
+                <div className="flex flex-col">
                     <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
@@ -1298,6 +1298,8 @@ export function WalletRankSlide({ data }: SlideProps) {
                 </div>
             </div>
         </motion.div>
+        {/* Spacer for Action Bar - hidden during capture */}
+        <div className="h-24 hidden md:block no-capture w-full flex-shrink-0" />
       </div>
 
       {/* Action Bar */}
