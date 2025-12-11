@@ -298,7 +298,7 @@ export function TopAssetSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
       <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
-        blockwrap.xyz
+        block-wrap.xyz
       </div>
     </div>
   );
@@ -687,7 +687,7 @@ export function InflowOutflowSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
       <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
-        blockwrap.xyz
+        block-wrap.xyz
       </div>
     </div>
   );
@@ -917,7 +917,7 @@ export function BiggestTransactionSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
       <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
-        blockwrap.xyz
+        block-wrap.xyz
       </div>
     </div>
   );
@@ -1182,7 +1182,7 @@ export function ShareSlide({ data }: SlideProps) {
 
       {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
       <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
-        blockwrap.xyz
+        block-wrap.xyz
       </div>
     </div>
   );
@@ -1397,7 +1397,7 @@ export function WalletRankSlide({ data }: SlideProps) {
 
        {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
       <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
-        blockwrap.xyz
+        block-wrap.xyz
       </div>
     </div>
   );
