@@ -522,7 +522,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
 
     // Determining Archetype (Precedence Order)
     if (txCount >= 1000) {
-        personality = "The Bot?";
+        personality = "The Diamond Hands";
     } else if (solVolUsd > 50000 && txCount < 20) {
         personality = "The Diamond Hands";
     } else if (nonSolTokenTxCount > 500) {
@@ -552,14 +552,18 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     const totalInflowUsd = totalInflow * solPrice;
     const totalOutflowUsd = totalOutflow * solPrice;
 
-    // Calculate Rank (Based on ~11.5M wallets estimates)
+    // Calculate Rank (Based on SOL balance)
     const calculateRank = (solBalance: number) => {
-        if (solBalance >= 1000) return { percentile: 0.2, label: "Solana Whale Shark" };
-        if (solBalance >= 100) return { percentile: 1.3, label: "Solana Whale" };
-        if (solBalance >= 20) return { percentile: 5, label: "Solana Dolphin" };
-        if (solBalance >= 10) return { percentile: 7, label: "Solana Fish" };
-        if (solBalance >= 1) return { percentile: 28, label: "Solana Shrimp" };
-        return { percentile: 50, label: "Solana Plankton" };
+        if (solBalance >= 50000) return { percentile: 0.05, label: "Solana Whale Shark" };
+        if (solBalance >= 10000) return { percentile: 0.1, label: "Solana Whale" };
+        if (solBalance >= 5000) return { percentile: 0.5, label: "Solana Whale" };
+        if (solBalance >= 1000) return { percentile: 2, label: "Solana Whale" };
+        if (solBalance >= 250) return { percentile: 5, label: "Solana Dolphin" };
+        if (solBalance >= 100) return { percentile: 7, label: "Solana Fish" };
+        if (solBalance >= 10) return { percentile: 25, label: "Solana Shrimp" };
+        if (solBalance >= 5) return { percentile: 75, label: "Solana Plankton" };
+        if (solBalance >= 1) return { percentile: 90, label: "Solana Plankton" };
+        return { percentile: 98, label: "Solana Normie" };
     };
 
     const solBalance = nativeBalance ? nativeBalance.lamports / 1e9 : 0;

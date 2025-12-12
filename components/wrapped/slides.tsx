@@ -1107,7 +1107,7 @@ export function ShareSlide({ data }: SlideProps) {
                  </div>
                  
                   <div>
-                     <p className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 tracking-tighter origin-left scale-y-[1.5]">
+                     <p className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 tracking-tighter origin-left scale-y-[1.5]">
                        {percentile}%
                      </p>
                      <div className="mt-3 flex items-center gap-2">
@@ -1328,7 +1328,7 @@ export function WalletRankSlide({ data }: SlideProps) {
         >
             <div className="border-b border-zinc-800 pb-8 mb-8">
               <div className="flex flex-col md:flex-row items-baseline gap-4 md:gap-8">
-                <h1 className="text-[4rem] md:text-[4rem] leading- font-black  text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 origin-bottom scale-y-[1.35]">
+                <h1 className="text-[3rem] md:text-[3.5rem] leading- font-black  text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-100 to-zinc-300 origin-bottom scale-y-[1.35]">
                     {percentile}%
                 </h1>
     
