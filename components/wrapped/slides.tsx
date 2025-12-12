@@ -1181,7 +1181,10 @@ export function ShareSlide({ data }: SlideProps) {
 
 
       {/* Watermark - Only visible during capture (controlled by isCapturing state for mobile Safari compatibility) */}
-      <div className={`absolute bottom-4 right-4 z-[100] font-bold text-white text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}>
+      <div 
+        className={`absolute bottom-4 right-4 z-[100] font-bold text-white/40 text-sm tracking-wider font-space pointer-events-none watermark transition-opacity ${isCapturing ? 'opacity-100' : 'opacity-0'}`}
+        style={{ textShadow: '0 0 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.5)' }}
+      >
         block-wrap.xyz
       </div>
     </div>
