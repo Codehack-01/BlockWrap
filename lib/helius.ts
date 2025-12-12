@@ -521,8 +521,10 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     const isSolanaMaxi = nonSolTokenTxCount === 0 && totalVolume > 0; // Pure SOL mover
 
     // Determining Archetype (Precedence Order)
-    if (txCount >= 1000) {
-        personality = "The Diamond Hands";
+    if (txCount >= 5000) {
+        personality = "The Bot?";
+    } else if (txCount >= 1000) {
+        personality = "SOL Soldier";
     } else if (solVolUsd > 50000 && txCount < 20) {
         personality = "The Diamond Hands";
     } else if (nonSolTokenTxCount > 500) {
@@ -536,7 +538,7 @@ export async function getHeliusData(address: string): Promise<WalletData> {
     } else if (isSolanaMaxi && txCount > 10) {
         personality = "The Solana Maxi";
     } else if (txCount > 100) {
-        personality = "The Trader";
+        personality = "SOL Banker";
     }
 
     // Calculate Percentage Change
