@@ -61,7 +61,7 @@ export function WrapModal({ isOpen, onClose, data }: WrapModalProps) {
               </button>
 
               {/* Content */}
-              <div className="relative w-full max-w-md h-full md:h-[85vh] bg-black md:rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col">
+              <div className="relative w-full max-w-md h-full md:h-[85vh] md:max-h-[700px] bg-black md:rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col">
                 <ShareSlide data={data} />
               </div>
             </div>

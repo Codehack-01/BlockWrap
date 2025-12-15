@@ -199,9 +199,9 @@ export function StoryContainer({ slides, onComplete }: StoryContainerProps) {
           ))}
         </div>
 
-        {/* Navigation Areas - Left */}
+        {/* Navigation Areas - Left (extends to center) */}
         <div
-          className="absolute left-0 top-0 bottom-0 w-1/3 z-40 cursor-w-resize"
+          className="absolute left-0 top-0 bottom-0 w-1/2 z-40 cursor-w-resize"
           onClick={() => handleClick('left')}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
@@ -210,9 +210,9 @@ export function StoryContainer({ slides, onComplete }: StoryContainerProps) {
           onTouchEnd={() => handleTouchEnd('left')}
         />
         
-        {/* Navigation Areas - Right */}
+        {/* Navigation Areas - Right (extends to center) */}
         <div
-          className="absolute right-0 top-0 bottom-0 w-1/3 z-40 cursor-e-resize"
+          className="absolute right-0 top-0 bottom-0 w-1/2 z-40 cursor-e-resize"
           onClick={() => handleClick('right')}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
@@ -222,7 +222,7 @@ export function StoryContainer({ slides, onComplete }: StoryContainerProps) {
         />
 
         {/* Content */}
-        <div className="w-full max-w-md h-full md:h-[80vh] md:rounded-3xl relative overflow-hidden bg-zinc-900 shadow-2xl border border-white/10">
+        <div className="w-full max-w-md h-full md:h-[80vh] md:max-h-[700px] md:rounded-3xl relative overflow-hidden bg-zinc-900 shadow-2xl border border-white/10">
           {/* Desktop click-to-pause overlay (full card area, z-index below action buttons) */}
           <div
             className="absolute inset-0 z-30 cursor-pointer hidden md:block"
