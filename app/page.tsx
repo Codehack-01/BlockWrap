@@ -99,6 +99,21 @@ export default function Home() {
           />
         </motion.div>
       </div>
+
+      {/* Footer Credit */}
+      <div className="absolute bottom-6 left-0 right-0 text-center">
+        <p className="text-sm text-muted-foreground">
+          built with ☕ by{" "}
+          <a 
+            href="https://x.com/0xjay247?s=21" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-white/70 hover:text-white underline underline-offset-2 transition-colors"
+          >
+            Adex
+          </a>
+        </p>
+      </div>
     </main>
   );
 }
